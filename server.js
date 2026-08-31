@@ -1,10 +1,15 @@
 /**
- * PERSONAL JLPT N3 LEARNING OS — server.js
+ * PERSONAL JLPT N3 LEARNING OS — server.js (Optimized for Vercel Serverless & Neon)
  * ---------------------------------------------------------
- * Node.js + Express + PostgreSQL (Neon) backend.
- * Session-based auth. Every registered user is `admin` — this
- * is a single-user personal application, role is always
- * decided server-side and never trusted from the client.
+ * Pastikan Anda sudah membuat tabel 'user_sessions' secara manual di Neon SQL Editor:
+ * 
+ * CREATE TABLE IF NOT EXISTS "user_sessions" (
+ *   "sid" varchar NOT NULL COLLATE "default",
+ *   "sess" json NOT NULL,
+ *   "expire" timestamp(6) NOT NULL
+ * ) WITH (OIDS=FALSE);
+ * ALTER TABLE "user_sessions" ADD CONSTRAINT "user_sessions_pkey" PRIMARY KEY ("sid") NOT DEFAULTS;
+ * CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "user_sessions" ("expire");
  * ---------------------------------------------------------
  */
 
@@ -25,27 +30,31 @@ const IS_PROD = NODE_ENV === 'production';
 const PORT = process.env.PORT || 3000;
 
 if (!process.env.DATABASE_URL) {
-  console.error('FATAL: DATABASE_URL is not set. Copy .env.example to .env and configure it.');
+  console.error('FATAL: DATABASE_URL is not set.');
   process.exit(1);
 }
 if (!process.env.SESSION_SECRET) {
-  console.error('FATAL: SESSION_SECRET is not set. Copy .env.example to .env and configure it.');
+  console.error('FATAL: SESSION_SECRET is not set.');
   process.exit(1);
 }
 
 // ---------------------------------------------------------
-// Database pool
+// Database pool (Optimized for Vercel Serverless & Neon)
 // ---------------------------------------------------------
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false },
+  max: 1, // WAJIB: Batasi 1 koneksi per instance serverless agar tidak membobol limit Neon
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
 });
+
 pool.on('error', (err) => {
   console.error('Unexpected PostgreSQL pool error:', err.message);
 });
 
 // ---------------------------------------------------------
-// App-level error type + response helpers (section 42 format)
+// App-level error type + response helpers
 // ---------------------------------------------------------
 class AppError extends Error {
   constructor(message, status = 400, details) {
@@ -99,7 +108,7 @@ const toSafeUser = (u) => ({
 });
 
 // ---------------------------------------------------------
-// HTML sanitization for Quill-authored content (stored XSS guard)
+// HTML sanitization for Quill-authored content
 // ---------------------------------------------------------
 function sanitizeQuillHtml(html) {
   return sanitizeHtml(html || '', {
@@ -185,14 +194,18 @@ app.use((err, req, res, next) => {
 });
 
 // ---------------------------------------------------------
-// Session
+// Session (Optimized for Serverless with pre-created table)
 // ---------------------------------------------------------
 const PgSession = pgSessionFactory(session);
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 app.use(session({
   name: 'jlpt_sid',
-  store: new PgSession({ pool, tableName: 'user_sessions', createTableIfMissing: true }),
+  store: new PgSession({ 
+    pool, 
+    tableName: 'user_sessions', 
+    createTableIfMissing: false // Dimatikan agar aman dari race condition di serverless
+  }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -1300,13 +1313,10 @@ app.use((err, req, res, next) => {
 // =========================================================
 // START SERVER / VERCEL EXPORT
 // =========================================================
-// Jika dijalankan di Vercel, Vercel yang akan menjadi servernya.
-// Jika dijalankan di lokal, kita gunakan app.listen.
 if (process.env.NODE_ENV !== 'production' || require.main === module) {
   app.listen(PORT, () => {
     console.log(`JLPT N3 Learning OS running on port ${PORT} [${NODE_ENV}]`);
   });
 }
 
-// EXPORT WAJIB UNTUK VERCEL SERVERLESS FUNCTION
 module.exports = app;
