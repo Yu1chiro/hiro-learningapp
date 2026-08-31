@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Home — JLPT N3 Learning OS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: {
+      fontFamily: { display: ['"Zen Maru Gothic"', 'sans-serif'], sans: ['Inter', 'sans-serif'] },
+      colors: { primary: { 50:'#eef4ff',100:'#dbe7ff',200:'#bcd3ff',300:'#8fb6ff',400:'#5c8fff',500:'#4c7cf3',600:'#3860d6',700:'#2d4bab',800:'#283f89',900:'#25386f' } },
+      boxShadow: { soft: '0 20px 45px -15px rgba(76,124,243,0.30)', softer: '0 4px 20px -4px rgba(76,124,243,0.15)' },
+    } }
+  };
+</script>
+<style>
+  body{font-family:'Inter',sans-serif;}
+  .font-display{font-family:'Zen Maru Gothic',sans-serif;}
+  .bg-app{background:radial-gradient(circle at 10% 0%,#eaf1ff 0%,transparent 40%),radial-gradient(circle at 90% 100%,#eef9f5 0%,transparent 35%),linear-gradient(180deg,#f5f8ff 0%,#ffffff 55%);}
+  .dark .bg-app{background:radial-gradient(circle at 10% 0%,#101a30 0%,transparent 40%),radial-gradient(circle at 90% 100%,#0e1e1c 0%,transparent 35%),linear-gradient(180deg,#0a0f1c 0%,#0b1220 55%);}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important;transition-duration:.001ms !important;} }
+  @keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes toast-out{from{opacity:1}to{opacity:0;transform:translateY(6px)}}
+  .toast-enter{animation:toast-in .22s ease-out}
+  .toast-exit{animation:toast-out .18s ease-in forwards}
+  .safe-bottom{padding-bottom:max(0.5rem, env(safe-area-inset-bottom));}
+  .nav-active{color:#4c7cf3 !important;}
+  .skeleton{background:linear-gradient(90deg,rgba(148,163,184,.15) 25%,rgba(148,163,184,.3) 37%,rgba(148,163,184,.15) 63%);background-size:400% 100%;animation:sk 1.4s ease infinite;}
+  @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+</style>
+</head>
+<body class="bg-app min-h-screen text-slate-800 dark:text-slate-100 antialiased pb-28">
+
+  <header class="sticky top-0 z-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur border-b border-white/60 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="h-9 w-9 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-softer">
+        <i class="fa-solid fa-torii-gate"></i>
+      </div>
+      <span class="font-display font-bold text-lg">N3 Learning OS</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="themeToggle" aria-label="Ganti tema" class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-primary-600 dark:text-primary-300">
+        <i class="fa-solid fa-moon dark:hidden"></i><i class="fa-solid fa-sun hidden dark:inline"></i>
+      </button>
+      <button id="logoutBtn" aria-label="Keluar" class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-rose-500">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-8">
+
+    <section>
+      <h1 class="font-display text-2xl sm:text-3xl font-bold">Selamat belajar, <span id="userGreeting" class="text-primary-600 dark:text-primary-400">...</span> 👋</h1>
+      <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm sm:text-base">Study → Retrieval → Quiz → Result → Analysis → Progress</p>
+    </section>
+
+    <section id="statCards" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="skeleton h-24 rounded-2xl"></div>
+      <div class="skeleton h-24 rounded-2xl"></div>
+      <div class="skeleton h-24 rounded-2xl"></div>
+      <div class="skeleton h-24 rounded-2xl"></div>
+    </section>
+
+    <section id="weakAreaSection" class="hidden">
+      <h2 class="font-display font-bold text-lg mb-3 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Perlu Direview</h2>
+      <div id="weakAreaList" class="grid sm:grid-cols-3 gap-3"></div>
+    </section>
+
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-display font-bold text-lg">Lesson Terbaru</h2>
+        <a href="/admin.html?section=lessons" class="text-sm text-primary-600 dark:text-primary-400 font-medium hover:underline">Kelola semua <i class="fa-solid fa-arrow-right text-xs"></i></a>
+      </div>
+      <div id="lessonList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="skeleton h-32 rounded-2xl"></div>
+        <div class="skeleton h-32 rounded-2xl"></div>
+        <div class="skeleton h-32 rounded-2xl"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav aria-label="Navigasi utama" class="fixed bottom-0 inset-x-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-t border-slate-200 dark:border-slate-800 safe-bottom">
+    <div class="max-w-3xl mx-auto grid grid-cols-5">
+      <a href="/index.html" data-page="home" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-house text-lg"></i><span class="text-[11px] font-medium">Home</span></a>
+      <a href="/study.html" data-page="study" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-book-open text-lg"></i><span class="text-[11px] font-medium">Study</span></a>
+      <a href="/quiz.html" data-page="quiz" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-pen-to-square text-lg"></i><span class="text-[11px] font-medium">Quiz</span></a>
+      <a href="/admin.html?section=statistics" data-page="progress" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-chart-line text-lg"></i><span class="text-[11px] font-medium">Progress</span></a>
+      <a href="/admin.html" data-page="admin" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-user-shield text-lg"></i><span class="text-[11px] font-medium">Admin</span></a>
+    </div>
+  </nav>
+
+  <div id="toastContainer" aria-live="polite" class="fixed bottom-24 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2 items-stretch sm:items-end"></div>
+
+<script>
+  document.querySelectorAll('[data-page="home"]').forEach(el => el.classList.add('nav-active'));
+
+  const root = document.documentElement;
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) root.classList.add('dark');
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    root.classList.toggle('dark');
+    localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
+  });
+
+  function showToast(message, type = 'info') {
+    const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+    const colors = { success:'border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300', error:'border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300', warning:'border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300', info:'border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-300' };
+    const el = document.createElement('div');
+    el.setAttribute('role', 'status');
+    el.className = `toast-enter max-w-sm w-full sm:w-96 bg-white dark:bg-slate-800 border ${colors[type]||colors.info} rounded-xl shadow-soft px-4 py-3 flex items-start gap-3`;
+    el.innerHTML = `<i class="fa-solid ${icons[type]||icons.info} mt-0.5"></i><p class="text-sm flex-1 text-slate-700 dark:text-slate-200">${message}</p><button aria-label="Tutup" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>`;
+    let dismissed = false;
+    const dismiss = () => { if (dismissed) return; dismissed = true; el.classList.remove('toast-enter'); el.classList.add('toast-exit'); setTimeout(()=>el.remove(),200); };
+    el.querySelector('button').addEventListener('click', dismiss);
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(dismiss, 4200);
+  }
+
+  async function api(path, options = {}) {
+    const res = await fetch('/api' + path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...options });
+    if (res.status === 401) { location.href = '/login.html?next=' + encodeURIComponent(location.pathname + location.search); throw new Error('unauthorized'); }
+    let body = {};
+    try { body = await res.json(); } catch(e){}
+    if (!res.ok || !body.success) { const err = new Error(body.message || 'Terjadi kesalahan'); err.status = res.status; throw err; }
+    return body.data;
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try { await api('/auth/logout', { method: 'POST' }); } catch(e){}
+    location.href = '/login.html';
+  });
+
+  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '-'; }
+
+  async function loadDashboard() {
+    try {
+      const { user } = await api('/auth/me');
+      document.getElementById('userGreeting').textContent = user.username;
+    } catch (e) { return; }
+
+    try {
+      const stats = await api('/statistics');
+      document.getElementById('statCards').innerHTML = `
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4">
+          <p class="text-xs text-slate-400 mb-1">Overall Accuracy</p>
+          <p class="font-display text-2xl font-bold text-primary-600 dark:text-primary-400">${stats.overall_accuracy}%</p>
+        </div>
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4">
+          <p class="text-xs text-slate-400 mb-1">Questions Answered</p>
+          <p class="font-display text-2xl font-bold">${stats.total_questions}</p>
+        </div>
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4">
+          <p class="text-xs text-slate-400 mb-1">Lessons</p>
+          <p class="font-display text-2xl font-bold">${stats.total_lessons}</p>
+        </div>
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4">
+          <p class="text-xs text-slate-400 mb-1">Avg Mastery</p>
+          <p class="font-display text-2xl font-bold text-emerald-500">${Math.round(stats.avg_mastery*100)}%</p>
+        </div>`;
+
+      if (stats.weak_areas && stats.weak_areas.length) {
+        document.getElementById('weakAreaSection').classList.remove('hidden');
+        document.getElementById('weakAreaList').innerHTML = stats.weak_areas.map(w => `
+          <div class="rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 p-4">
+            <p class="text-sm font-semibold text-amber-700 dark:text-amber-300">${w.label}</p>
+            <p class="text-2xl font-display font-bold text-amber-600 dark:text-amber-400">${w.accuracy}%</p>
+          </div>`).join('');
+      }
+    } catch (e) {
+      document.getElementById('statCards').innerHTML = '<p class="col-span-full text-sm text-slate-400">Belum ada data quiz.</p>';
+    }
+
+    try {
+      const lessons = await api('/lessons');
+      const listEl = document.getElementById('lessonList');
+      if (!lessons.length) {
+        listEl.innerHTML = '<p class="col-span-full text-sm text-slate-400">Belum ada lesson. Buat lesson pertama di halaman Admin.</p>';
+        return;
+      }
+      listEl.innerHTML = lessons.slice(0, 6).map(l => `
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4 flex flex-col justify-between">
+          <div>
+            <p class="font-display font-bold">${l.title}</p>
+            <p class="text-xs text-slate-400 mt-1"><i class="fa-regular fa-calendar"></i> ${fmtDate(l.study_date)}</p>
+            ${l.description ? `<p class="text-sm text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">${l.description}</p>` : ''}
+          </div>
+          <div class="flex gap-2 mt-4">
+            <a href="/study.html?lesson_id=${l.id}" class="flex-1 text-center text-sm font-semibold rounded-lg bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-300 py-2 hover:bg-primary-100 transition"><i class="fa-solid fa-book-open"></i> Study</a>
+            <a href="/quiz.html?lesson_id=${l.id}" class="flex-1 text-center text-sm font-semibold rounded-lg bg-primary-500 text-white py-2 hover:bg-primary-600 transition"><i class="fa-solid fa-play"></i> Quiz</a>
+          </div>
+        </div>`).join('');
+    } catch (e) {
+      showToast('Gagal memuat lesson', 'error');
+    }
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>

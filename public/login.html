@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Masuk — JLPT N3 Learning OS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { display: ['"Zen Maru Gothic"', 'sans-serif'], sans: ['Inter', 'sans-serif'] },
+        colors: {
+          primary: { 50:'#eef4ff',100:'#dbe7ff',200:'#bcd3ff',300:'#8fb6ff',400:'#5c8fff',500:'#4c7cf3',600:'#3860d6',700:'#2d4bab',800:'#283f89',900:'#25386f' },
+        },
+        boxShadow: { soft: '0 20px 45px -15px rgba(76,124,243,0.35)' },
+      }
+    }
+  };
+</script>
+<style>
+  body{font-family:'Inter',sans-serif;}
+  .font-display{font-family:'Zen Maru Gothic',sans-serif;}
+  .bg-app{background:radial-gradient(circle at 15% 10%,#eaf1ff 0%,transparent 45%),radial-gradient(circle at 85% 90%,#eef9f5 0%,transparent 40%),linear-gradient(180deg,#f5f8ff 0%,#ffffff 60%);}
+  .dark .bg-app{background:radial-gradient(circle at 15% 10%,#101a30 0%,transparent 45%),radial-gradient(circle at 85% 90%,#0e1e1c 0%,transparent 40%),linear-gradient(180deg,#0a0f1c 0%,#0b1220 60%);}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important;transition-duration:.001ms !important;} }
+  @keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes toast-out{from{opacity:1}to{opacity:0;transform:translateY(6px)}}
+  .toast-enter{animation:toast-in .22s ease-out}
+  .toast-exit{animation:toast-out .18s ease-in forwards}
+  .tab-active{background:white;box-shadow:0 2px 10px -2px rgba(76,124,243,.35);}
+  .dark .tab-active{background:#1b2740;}
+</style>
+</head>
+<body class="bg-app min-h-screen text-slate-800 dark:text-slate-100 antialiased">
+
+  <button id="themeToggle" aria-label="Ganti tema gelap/terang"
+    class="fixed top-4 right-4 z-40 h-10 w-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow-softer flex items-center justify-center text-primary-600 dark:text-primary-300 backdrop-blur border border-white/60 dark:border-slate-700 transition">
+    <i class="fa-solid fa-moon dark:hidden"></i>
+    <i class="fa-solid fa-sun hidden dark:inline"></i>
+  </button>
+
+  <main class="min-h-screen flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md">
+
+      <div class="text-center mb-6">
+        <div class="mx-auto mb-3 h-14 w-14 rounded-2xl bg-primary-500 text-white flex items-center justify-center shadow-soft">
+          <i class="fa-solid fa-torii-gate text-2xl"></i>
+        </div>
+        <h1 class="font-display text-2xl font-bold text-slate-800 dark:text-white">N3 Learning OS</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Study → Retrieval → Quiz → Analysis → Progress</p>
+      </div>
+
+      <div class="rounded-3xl bg-white/70 dark:bg-slate-800/60 backdrop-blur border border-white/60 dark:border-slate-700 shadow-soft p-6 sm:p-8">
+        <!-- hidden if create -->
+        <div role="tablist" aria-label="Pilih login atau register" class="grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-900/60 mb-6">
+          <button id="tabLoginBtn" role="tab" aria-selected="true" aria-controls="loginPanel" class="tab-active hidden rounded-lg py-2 text-sm font-semibold transition">Masuk</button>
+          <button id="tabRegisterBtn" role="tab" aria-selected="false" aria-controls="registerPanel" class=" hidden rounded-lg py-2 text-sm font-semibold text-slate-500 dark:text-slate-300 transition">Daftar</button>
+        </div>
+
+        <form id="loginPanel" role="tabpanel" class="space-y-4">
+          <div>
+            <label for="loginId" class="block text-sm font-medium mb-1">Username atau Email</label>
+            <input id="loginId" name="identifier" type="text" required autocomplete="username"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary-400 transition" placeholder="agus atau agus@email.com">
+          </div>
+          <div>
+            <label for="loginPassword" class="block text-sm font-medium mb-1">Password</label>
+            <div class="relative">
+              <input id="loginPassword" name="password" type="password" required autocomplete="current-password"
+                class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-4 py-2.5 pr-11 outline-none focus:ring-2 focus:ring-primary-400 transition" placeholder="••••••••">
+              <button type="button" data-toggle-pass="loginPassword" aria-label="Tampilkan password" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <button id="loginSubmit" type="submit" class="w-full rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2.5 shadow-soft transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <i class="fa-solid fa-right-to-bracket"></i> <span>Masuk</span>
+          </button>
+        </form>
+
+        <form id="registerPanel" role="tabpanel" class="space-y-4 hidden">
+          <div>
+            <label for="regUsername" class="block text-sm font-medium mb-1">Username</label>
+            <input id="regUsername" name="username" type="text" required minlength="3" maxlength="50" pattern="[A-Za-z0-9_.\-]+" autocomplete="username"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary-400 transition" placeholder="agus_dev">
+          </div>
+          <div>
+            <label for="regEmail" class="block text-sm font-medium mb-1">Email</label>
+            <input id="regEmail" name="email" type="email" required autocomplete="email"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary-400 transition" placeholder="agus@email.com">
+          </div>
+          <div>
+            <label for="regPassword" class="block text-sm font-medium mb-1">Password</label>
+            <div class="relative">
+              <input id="regPassword" name="password" type="password" required minlength="8" autocomplete="new-password"
+                class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-4 py-2.5 pr-11 outline-none focus:ring-2 focus:ring-primary-400 transition" placeholder="Minimal 8 karakter, huruf + angka">
+              <button type="button" data-toggle-pass="regPassword" aria-label="Tampilkan password" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Aplikasi personal — akun yang mendaftar otomatis menjadi admin penuh.</p>
+          </div>
+          <button id="registerSubmit" type="submit" class="w-full rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2.5 shadow-soft transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <i class="fa-solid fa-user-plus"></i> <span>Daftar & Mulai</span>
+          </button>
+        </form>
+
+      </div>
+      <p class="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">Personal JLPT N3 Learning OS</p>
+    </div>
+  </main>
+
+  <div id="toastContainer" aria-live="polite" class="fixed bottom-4 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2 items-stretch sm:items-end"></div>
+
+<script>
+  // ---------- Theme ----------
+  const root = document.documentElement;
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) root.classList.add('dark');
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    root.classList.toggle('dark');
+    localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
+  });
+
+  // ---------- Toast ----------
+  function showToast(message, type = 'info') {
+    const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+    const colors = {
+      success: 'border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300',
+      error: 'border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300',
+      warning: 'border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300',
+      info: 'border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-300',
+    };
+    const el = document.createElement('div');
+    el.setAttribute('role', 'status');
+    el.className = `toast-enter max-w-sm w-full sm:w-96 bg-white dark:bg-slate-800 border ${colors[type] || colors.info} rounded-xl shadow-soft px-4 py-3 flex items-start gap-3`;
+    el.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} mt-0.5"></i><p class="text-sm flex-1 text-slate-700 dark:text-slate-200">${message}</p>
+      <button aria-label="Tutup" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>`;
+    el.querySelector('button').addEventListener('click', () => dismiss());
+    document.getElementById('toastContainer').appendChild(el);
+    let dismissed = false;
+    function dismiss() {
+      if (dismissed) return;
+      dismissed = true;
+      el.classList.remove('toast-enter');
+      el.classList.add('toast-exit');
+      setTimeout(() => el.remove(), 200);
+    }
+    setTimeout(dismiss, 4200);
+  }
+
+  // ---------- API helper ----------
+  async function api(path, options = {}) {
+    const res = await fetch('/api' + path, {
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    let body = {};
+    try { body = await res.json(); } catch (e) { /* no body */ }
+    if (!res.ok || !body.success) {
+      const err = new Error(body.message || 'Terjadi kesalahan');
+      err.status = res.status;
+      err.details = body.details;
+      throw err;
+    }
+    return body.data;
+  }
+
+  // ---------- Password visibility ----------
+  document.querySelectorAll('[data-toggle-pass]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.togglePass);
+      const isPwd = input.type === 'password';
+      input.type = isPwd ? 'text' : 'password';
+      btn.querySelector('i').className = isPwd ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    });
+  });
+
+  // ---------- Tabs ----------
+  const tabLoginBtn = document.getElementById('tabLoginBtn');
+  const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+  const loginPanel = document.getElementById('loginPanel');
+  const registerPanel = document.getElementById('registerPanel');
+  function activateTab(which) {
+    const isLogin = which === 'login';
+    loginPanel.classList.toggle('hidden', !isLogin);
+    registerPanel.classList.toggle('hidden', isLogin);
+    tabLoginBtn.classList.toggle('tab-active', isLogin);
+    tabRegisterBtn.classList.toggle('tab-active', !isLogin);
+    tabLoginBtn.setAttribute('aria-selected', String(isLogin));
+    tabRegisterBtn.setAttribute('aria-selected', String(!isLogin));
+    tabLoginBtn.classList.toggle('text-slate-500', !isLogin);
+    tabRegisterBtn.classList.toggle('text-slate-500', isLogin);
+  }
+  tabLoginBtn.addEventListener('click', () => activateTab('login'));
+  tabRegisterBtn.addEventListener('click', () => activateTab('register'));
+  if (new URLSearchParams(location.search).get('mode') === 'register') activateTab('register');
+
+  // ---------- Double-submit guard ----------
+  function guardSubmit(button, fn) {
+    return async (...args) => {
+      if (button.dataset.busy === '1') return;
+      button.dataset.busy = '1';
+      button.disabled = true;
+      const original = button.innerHTML;
+      button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Memproses...</span>';
+      try {
+        await fn(...args);
+      } finally {
+        button.dataset.busy = '0';
+        button.disabled = false;
+        button.innerHTML = original;
+      }
+    };
+  }
+
+  function redirectAfterAuth(fallback) {
+    const next = new URLSearchParams(location.search).get('next');
+    location.href = next && next.startsWith('/') ? next : fallback;
+  }
+
+  // ---------- Login ----------
+  const loginSubmitBtn = document.getElementById('loginSubmit');
+  loginPanel.addEventListener('submit', guardSubmit(loginSubmitBtn, async (e) => {
+    e.preventDefault();
+    try {
+      await api('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          identifier: document.getElementById('loginId').value.trim(),
+          password: document.getElementById('loginPassword').value,
+        }),
+      });
+      showToast('Berhasil masuk. Mengalihkan...', 'success');
+      redirectAfterAuth('/index.html');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }));
+
+  // ---------- Register ----------
+  const registerSubmitBtn = document.getElementById('registerSubmit');
+  registerPanel.addEventListener('submit', guardSubmit(registerSubmitBtn, async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('regPassword').value;
+    if (password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+      showToast('Password minimal 8 karakter dan mengandung huruf serta angka', 'warning');
+      return;
+    }
+    try {
+      await api('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: document.getElementById('regUsername').value.trim(),
+          email: document.getElementById('regEmail').value.trim(),
+          password,
+        }),
+      });
+      showToast('Akun berhasil dibuat. Selamat datang!', 'success');
+      location.href = '/admin.html';
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }));
+
+  // If already logged in, skip straight past login
+  api('/auth/me').then(() => redirectAfterAuth('/index.html')).catch(() => {});
+</script>
+</body>
+</html>

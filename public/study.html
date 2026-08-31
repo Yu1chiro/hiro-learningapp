@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Study – JLPT N3 Learning OS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = { darkMode:'class', theme:{ extend:{
+    fontFamily:{ display:['"Zen Maru Gothic"','sans-serif'], sans:['Inter','sans-serif'] },
+    colors:{ primary:{50:'#eef4ff',100:'#dbe7ff',200:'#bcd3ff',300:'#8fb6ff',400:'#5c8fff',500:'#4c7cf3',600:'#3860d6',700:'#2d4bab',800:'#283f89',900:'#25386f'} },
+    boxShadow:{ soft:'0 20px 45px -15px rgba(76,124,243,0.30)', softer:'0 4px 20px -4px rgba(76,124,243,0.15)' },
+  }}};
+</script>
+<style>
+  body{font-family:'Inter',sans-serif;}
+  .font-display{font-family:'Zen Maru Gothic',sans-serif;}
+  .bg-app{background:radial-gradient(circle at 10% 0%,#eaf1ff 0%,transparent 40%),radial-gradient(circle at 90% 100%,#eef9f5 0%,transparent 35%),linear-gradient(180deg,#f5f8ff 0%,#ffffff 55%);}
+  .dark .bg-app{background:radial-gradient(circle at 10% 0%,#101a30 0%,transparent 40%),radial-gradient(circle at 90% 100%,#0e1e1c 0%,transparent 35%),linear-gradient(180deg,#0a0f1c 0%,#0b1220 55%);}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important;transition-duration:.001ms !important;} }
+  @keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes toast-out{from{opacity:1}to{opacity:0;transform:translateY(6px)}}
+  .toast-enter{animation:toast-in .22s ease-out} .toast-exit{animation:toast-out .18s ease-in forwards}
+  .safe-bottom{padding-bottom:max(0.5rem, env(safe-area-inset-bottom));}
+  .nav-active{color:#4c7cf3 !important;}
+  .skeleton{background:linear-gradient(90deg,rgba(148,163,184,.15) 25%,rgba(148,163,184,.3) 37%,rgba(148,163,184,.15) 63%);background-size:400% 100%;animation:sk 1.4s ease infinite;}
+  @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+  .prose-material :where(p,ul,ol,blockquote){margin-bottom:.75em;}
+  .prose-material ul{list-style:disc;padding-left:1.4em;} .prose-material ol{list-style:decimal;padding-left:1.4em;}
+  .prose-material blockquote{border-left:3px solid #8fb6ff;padding-left:.9em;color:#64748b;font-style:italic;}
+  .prose-material pre{background:#0f172a;color:#e2e8f0;padding:.75em 1em;border-radius:.6em;overflow-x:auto;font-size:.85em;}
+  .prose-material h1{font-size:1.35em;font-weight:700;margin-bottom:.4em;} .prose-material h2{font-size:1.2em;font-weight:700;margin-bottom:.4em;} .prose-material h3{font-size:1.05em;font-weight:700;margin-bottom:.3em;}
+</style>
+</head>
+<body class="bg-app min-h-screen text-slate-800 dark:text-slate-100 antialiased pb-28">
+  <header class="sticky top-0 z-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur border-b border-white/60 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5">
+      <div class="h-9 w-9 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-softer"><i class="fa-solid fa-book-open"></i></div>
+      <span class="font-display font-bold text-lg">Study</span>
+    </a>
+    <button id="themeToggle" aria-label="Ganti tema" class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-primary-600 dark:text-primary-300">
+      <i class="fa-solid fa-moon dark:hidden"></i><i class="fa-solid fa-sun hidden dark:inline"></i>
+    </button>
+  </header>
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div id="lessonPicker" class="hidden">
+      <h1 class="font-display text-xl font-bold mb-3">Pilih Lesson</h1>
+      <div id="lessonPickerList" class="grid sm:grid-cols-2 gap-3"></div>
+    </div>
+    <div id="lessonView" class="hidden space-y-6">
+      <div>
+        <a href="/" class="text-sm text-primary-600 dark:text-primary-400 font-medium"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
+        <h1 id="lessonTitle" class="font-display text-2xl font-bold mt-2"></h1>
+        <p id="lessonDesc" class="text-slate-500 dark:text-slate-400 text-sm mt-1"></p>
+      </div>
+      <section id="materialsSection" class="hidden space-y-3">
+        <h2 class="font-display font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-file-lines text-primary-500"></i> Study Material</h2>
+        <div id="materialsList" class="space-y-3"></div>
+      </section>
+      <section id="grammarSection" class="hidden space-y-3">
+        <h2 class="font-display font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-diagram-project text-primary-500"></i> Grammar</h2>
+        <div id="grammarList" class="space-y-3"></div>
+      </section>
+      <section id="vocabSection" class="hidden space-y-3">
+        <h2 class="font-display font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-spell-check text-primary-500"></i> Vocabulary</h2>
+        <div id="vocabList" class="grid sm:grid-cols-2 gap-3"></div>
+      </section>
+      <section id="kanjiSection" class="hidden space-y-3">
+        <h2 class="font-display font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-language text-primary-500"></i> Kanji</h2>
+        <div id="kanjiList" class="grid sm:grid-cols-2 gap-3"></div>
+      </section>
+      <div id="emptyState" class="hidden text-center py-10 text-slate-400">
+        <i class="fa-regular fa-folder-open text-3xl mb-2"></i>
+        <p>Lesson ini belum memiliki materi. Kamu tetap bisa langsung quiz jika question sudah tersedia.</p>
+      </div>
+      <div class="sticky bottom-24 pt-4">
+        <button id="readyQuizBtn" class="w-full rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-display font-bold py-4 shadow-soft transition flex items-center justify-center gap-2 text-lg">
+          <i class="fa-solid fa-bolt"></i> SIAP QUIZ
+        </button>
+      </div>
+    </div>
+    <div id="loadingState" class="space-y-3">
+      <div class="skeleton h-8 w-2/3 rounded-lg"></div>
+      <div class="skeleton h-40 rounded-2xl"></div>
+      <div class="skeleton h-40 rounded-2xl"></div>
+    </div>
+  </main>
+  <nav aria-label="Navigasi utama" class="fixed bottom-0 inset-x-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-t border-slate-200 dark:border-slate-800 safe-bottom">
+    <div class="max-w-3xl mx-auto grid grid-cols-5">
+      <a href="/" data-page="home" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-house text-lg"></i><span class="text-[11px] font-medium">Home</span></a>
+      <a href="/study" data-page="study" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-book-open text-lg"></i><span class="text-[11px] font-medium">Study</span></a>
+      <a href="/quiz" data-page="quiz" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-pen-to-square text-lg"></i><span class="text-[11px] font-medium">Quiz</span></a>
+      <a href="/admin?section=statistics" data-page="progress" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-chart-line text-lg"></i><span class="text-[11px] font-medium">Progress</span></a>
+      <a href="/admin" data-page="admin" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-user-shield text-lg"></i><span class="text-[11px] font-medium">Admin</span></a>
+    </div>
+  </nav>
+  <div id="toastContainer" aria-live="polite" class="fixed bottom-24 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2 items-stretch sm:items-end"></div>
+<script>
+document.querySelectorAll('[data-page="study"]').forEach(el => el.classList.add('nav-active'));
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) root.classList.add('dark');
+document.getElementById('themeToggle').addEventListener('click', () => { root.classList.toggle('dark'); localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light'); });
+
+function showToast(message, type = 'info') {
+  const icons = { success:'fa-circle-check', error:'fa-circle-exclamation', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+  const colors = { success:'border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300', error:'border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300', warning:'border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300', info:'border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-300' };
+  const el = document.createElement('div');
+  el.setAttribute('role','status');
+  el.className = `toast-enter max-w-sm w-full sm:w-96 bg-white dark:bg-slate-800 border ${colors[type]||colors.info} rounded-xl shadow-soft px-4 py-3 flex items-start gap-3`;
+  el.innerHTML = `<i class="fa-solid ${icons[type]||icons.info} mt-0.5"></i><p class="text-sm flex-1 text-slate-700 dark:text-slate-200">${message}</p><button aria-label="Tutup" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>`;
+  let dismissed = false;
+  const dismiss = () => { if (dismissed) return; dismissed = true; el.classList.remove('toast-enter'); el.classList.add('toast-exit'); setTimeout(()=>el.remove(),200); };
+  el.querySelector('button').addEventListener('click', dismiss);
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(dismiss, 4200);
+}
+
+function escapeHtml(str) { 
+  return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); 
+}
+
+async function api(path, options = {}) {
+  const res = await fetch('/api' + path, { credentials:'same-origin', headers:{'Content-Type':'application/json'}, ...options });
+  if (res.status === 401) { location.href = '/login?next=' + encodeURIComponent(location.pathname + location.search); throw new Error('unauthorized'); }
+  let body = {}; try { body = await res.json(); } catch(e){}
+  if (!res.ok || !body.success) { const err = new Error(body.message || 'Terjadi kesalahan'); err.status = res.status; throw err; }
+  return body.data;
+}
+
+const params = new URLSearchParams(location.search);
+const lessonId = params.get('lesson_id');
+
+async function init() {
+  try { await api('/auth/me'); } catch(e) { return; }
+  if (!lessonId) {
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('lessonPicker').classList.remove('hidden');
+    try {
+      const lessons = await api('/lessons');
+      const el = document.getElementById('lessonPickerList');
+      el.innerHTML = lessons.length ? lessons.map(l => `
+        <a href="/study?lesson_id=${l.id}" class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4 block hover:shadow-soft transition">
+          <p class="font-display font-bold">${escapeHtml(l.title)}</p>
+          ${l.description ? `<p class="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">${escapeHtml(l.description)}</p>` : ''}
+        </a>`).join('') : '<p class="text-slate-400 text-sm col-span-full">Belum ada lesson. Buat dulu di halaman Admin.</p>';
+    } catch (e) { showToast('Gagal memuat lesson', 'error'); }
+    return;
+  }
+  try {
+    const [lesson, materials, grammar, vocabulary, kanji] = await Promise.all([
+      api(`/lessons/${lessonId}`),
+      api(`/materials?lesson_id=${lessonId}`),
+      api(`/grammar?lesson_id=${lessonId}`),
+      api(`/vocabulary?lesson_id=${lessonId}`),
+      api(`/kanji?lesson_id=${lessonId}`),
+    ]);
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('lessonView').classList.remove('hidden');
+    document.getElementById('lessonTitle').textContent = lesson.title;
+    document.getElementById('lessonDesc').textContent = lesson.description || '';
+    let anyContent = false;
+    if (materials.length) {
+      anyContent = true;
+      document.getElementById('materialsSection').classList.remove('hidden');
+      document.getElementById('materialsList').innerHTML = materials.map(m => `
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-[10px] uppercase tracking-wide font-bold px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-300">${escapeHtml(m.material_type)}</span>
+            <h3 class="font-display font-bold">${escapeHtml(m.title)}</h3>
+          </div>
+          <div class="prose-material text-sm text-slate-700 dark:text-slate-300">${m.content_html}</div>
+        </div>`).join('');
+    }
+    if (grammar.length) {
+      anyContent = true;
+      document.getElementById('grammarSection').classList.remove('hidden');
+      document.getElementById('grammarList').innerHTML = grammar.map(g => `
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-5">
+          <p class="font-display text-lg font-bold text-primary-600 dark:text-primary-400">${escapeHtml(g.pattern)}</p>
+          <p class="text-sm font-medium mt-1 mb-3">${escapeHtml(g.meaning)}</p>
+          ${g.explanation ? `<div class="prose-material text-sm text-slate-700 dark:text-slate-300">${g.explanation}</div>` : ''}
+        </div>`).join('');
+    }
+    if (vocabulary.length) {
+      anyContent = true;
+      document.getElementById('vocabSection').classList.remove('hidden');
+      document.getElementById('vocabList').innerHTML = vocabulary.map(v => `
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4">
+          <div class="flex items-baseline justify-between">
+            <p class="font-display text-lg font-bold">${escapeHtml(v.word)}</p>
+            ${v.reading ? `<p class="text-xs text-slate-400">${escapeHtml(v.reading)}</p>` : ''}
+          </div>
+          <p class="text-sm mt-1">${escapeHtml(v.meaning)}</p>
+          ${v.part_of_speech ? `<span class="inline-block mt-1 text-[10px] uppercase tracking-wide text-slate-400">${escapeHtml(v.part_of_speech)}</span>` : ''}
+          ${v.example_sentence ? `<div class="mt-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 p-2.5 text-sm">
+            <p>${escapeHtml(v.example_sentence)}</p>${v.example_translation ? `<p class="text-xs text-slate-400 mt-0.5">${escapeHtml(v.example_translation)}</p>` : ''}
+          </div>` : ''}
+        </div>`).join('');
+    }
+    if (kanji.length) {
+      anyContent = true;
+      document.getElementById('kanjiSection').classList.remove('hidden');
+      document.getElementById('kanjiList').innerHTML = kanji.map(k => `
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between gap-2">
+              <p class="font-display text-xl font-bold text-primary-600 dark:text-primary-400">${escapeHtml(k.character)}</p>
+              ${k.onyomi ? `<span class="text-xs font-semibold px-2 py-0.5 rounded-lg bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-300">${escapeHtml(k.onyomi)}</span>` : ''}
+            </div>
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 mt-1.5">${escapeHtml(k.meaning)}</p>
+          </div>
+          ${(k.example_word || k.example_reading) ? `
+            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700 text-xs space-y-1">
+              ${k.example_word ? `<p class="font-medium text-slate-800 dark:text-slate-200">${escapeHtml(k.example_word)}</p>` : ''}
+              ${k.example_reading ? `<p class="text-slate-400">${escapeHtml(k.example_reading)}</p>` : ''}
+            </div>` : ''}
+        </div>`).join('');
+    }
+    if (!anyContent) document.getElementById('emptyState').classList.remove('hidden');
+    document.getElementById('readyQuizBtn').addEventListener('click', () => {
+      location.href = `/quiz?lesson_id=${lessonId}`;
+    });
+  } catch (e) {
+    document.getElementById('loadingState').classList.add('hidden');
+    showToast(e.message || 'Gagal memuat lesson', 'error');
+  }
+}
+init();
+</script>
+</body>
+</html>

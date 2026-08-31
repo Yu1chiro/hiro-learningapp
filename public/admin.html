@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Admin - JLPT N3 Learning OS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script>
+  tailwind.config = { darkMode:'class', theme:{ extend:{
+    fontFamily:{ display:['"Zen Maru Gothic"','sans-serif'], sans:['Inter','sans-serif'] },
+    colors:{ primary:{50:'#eef4ff',100:'#dbe7ff',200:'#bcd3ff',300:'#8fb6ff',400:'#5c8fff',500:'#4c7cf3',600:'#3860d6',700:'#2d4bab',800:'#283f89',900:'#25386f'} },
+    boxShadow:{ soft:'0 20px 45px -15px rgba(76,124,243,0.30)', softer:'0 4px 20px -4px rgba(76,124,243,0.15)' },
+  }}};
+</script>
+<style>
+  body{font-family:'Inter',sans-serif;}
+  .font-display{font-family:'Zen Maru Gothic',sans-serif;}
+  .bg-app{background:radial-gradient(circle at 10% 0%,#eaf1ff 0%,transparent 40%),radial-gradient(circle at 90% 100%,#eef9f5 0%,transparent 35%),linear-gradient(180deg,#f5f8ff 0%,#ffffff 55%);}
+  .dark .bg-app{background:radial-gradient(circle at 10% 0%,#101a30 0%,transparent 40%),radial-gradient(circle at 90% 100%,#0e1e1c 0%,transparent 35%),linear-gradient(180deg,#0a0f1c 0%,#0b1220 55%);}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important;transition-duration:.001ms !important;} }
+  @keyframes toast-in{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes toast-out{from{opacity:1}to{opacity:0;transform:translateY(6px)}}
+  .toast-enter{animation:toast-in .22s ease-out} .toast-exit{animation:toast-out .18s ease-in forwards}
+  @keyframes modal-in{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .modal-in{animation:modal-in .18s ease-out}
+  .safe-bottom{padding-bottom:max(0.5rem, env(safe-area-inset-bottom));}
+  .nav-active{color:#4c7cf3 !important;}
+  .tab-active{background:#4c7cf3 !important;color:#fff !important;}
+  .skeleton{background:linear-gradient(90deg,rgba(148,163,184,.15) 25%,rgba(148,163,184,.3) 37%,rgba(148,163,184,.15) 63%);background-size:400% 100%;animation:sk 1.4s ease infinite;}
+  @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+  .subtab-active{border-color:#4c7cf3 !important;color:#4c7cf3 !important;}
+  .dark .subtab-active{color:#8fb6ff !important;}
+  .field-input{width:100%;border-radius:.75rem;border:1px solid rgb(226 232 240);padding:.55rem .9rem;background:#fff;outline:none;transition:.15s;}
+  .dark .field-input{border-color:rgb(51 65 85);background:rgba(15,23,42,.6);color:#e2e8f0;}
+  .field-input:focus{box-shadow:0 0 0 3px rgba(76,124,243,.3);border-color:#4c7cf3;}
+  .field-label{display:block;font-size:.8rem;font-weight:600;margin-bottom:.3rem;color:#475569;}
+  .dark .field-label{color:#94a3b8;}
+  .ql-toolbar.ql-snow{border-radius:.75rem .75rem 0 0;border-color:rgb(226 232 240);border-bottom:none;}
+  .ql-container.ql-snow{border-radius:0 0 .75rem .75rem;border-color:rgb(226 232 240);min-height:160px;font-size:.95rem;}
+  .dark .ql-toolbar.ql-snow{border-color:rgb(51 65 85);background:rgba(30,41,59,.4);}
+  .dark .ql-container.ql-snow{border-color:rgb(51 65 85);background:rgba(15,23,42,.4);color:#e2e8f0;}
+  .dark .ql-snow .ql-stroke{stroke:#94a3b8;} .dark .ql-snow .ql-fill{fill:#94a3b8;} .dark .ql-snow .ql-picker{color:#94a3b8;}
+  .badge{display:inline-flex;align-items:center;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:.15rem .55rem;border-radius:9999px;}
+</style>
+</head>
+<body class="bg-app min-h-screen text-slate-800 dark:text-slate-100 antialiased pb-28">
+  <header class="sticky top-0 z-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur border-b border-white/60 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="h-9 w-9 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-softer"><i class="fa-solid fa-user-shield"></i></div>
+      <span class="font-display font-bold text-lg">Admin</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="themeToggle" aria-label="Ganti tema" class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-primary-600 dark:text-primary-300">
+        <i class="fa-solid fa-moon dark:hidden"></i><i class="fa-solid fa-sun hidden dark:inline"></i>
+      </button>
+      <button id="logoutBtn" aria-label="Keluar" class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-rose-500">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </header>
+  <div class="sticky top-[57px] z-10 bg-white/60 dark:bg-slate-900/60 backdrop-blur border-b border-white/60 dark:border-slate-800 overflow-x-auto scrollbar-hide">
+    <div id="sectionTabs" class="max-w-5xl mx-auto flex gap-1.5 px-4 sm:px-6 py-2 whitespace-nowrap"></div>
+  </div>
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+    <div id="sectionContent"></div>
+  </main>
+  <nav aria-label="Navigasi utama" class="fixed bottom-0 inset-x-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-t border-slate-200 dark:border-slate-800 safe-bottom">
+    <div class="max-w-3xl mx-auto grid grid-cols-5">
+      <a href="/" data-page="home" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-house text-lg"></i><span class="text-[11px] font-medium">Home</span></a>
+      <a href="/study" data-page="study" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-book-open text-lg"></i><span class="text-[11px] font-medium">Study</span></a>
+      <a href="/quiz" data-page="quiz" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-pen-to-square text-lg"></i><span class="text-[11px] font-medium">Quiz</span></a>
+      <a href="/admin?section=statistics" data-page="progress" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-chart-line text-lg"></i><span class="text-[11px] font-medium">Progress</span></a>
+      <a href="/admin" data-page="admin" class="nav-link flex flex-col items-center justify-center gap-1 py-2.5 text-slate-400 transition"><i class="fa-solid fa-user-shield text-lg"></i><span class="text-[11px] font-medium">Admin</span></a>
+    </div>
+  </nav>
+
+  <!-- Modal -->
+  <div id="modalOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="modal-in bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl shadow-soft max-h-[92vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white dark:bg-slate-800 flex items-center justify-between px-5 sm:px-6 pt-5 pb-3 border-b border-slate-100 dark:border-slate-700 z-10">
+        <h3 id="modalTitle" class="font-display font-bold text-lg"></h3>
+        <button id="modalCloseBtn" aria-label="Tutup" class="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="modalBody" class="px-5 sm:px-6 py-5"></div>
+    </div>
+  </div>
+
+  <div id="toastContainer" aria-live="polite" class="fixed bottom-24 right-4 left-4 sm:left-auto z-[60] flex flex-col gap-2 items-stretch sm:items-end"></div>
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+document.querySelectorAll('[data-page="admin"]').forEach(el => el.classList.add('nav-active'));
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) root.classList.add('dark');
+document.getElementById('themeToggle').addEventListener('click', () => {
+  root.classList.toggle('dark');
+  localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
+});
+
+// ---------- Toast ----------
+function showToast(message, type = 'info') {
+  const icons = { success:'fa-circle-check', error:'fa-circle-exclamation', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+  const colors = { success:'border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300', error:'border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300', warning:'border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300', info:'border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-300' };
+  const el = document.createElement('div');
+  el.setAttribute('role', 'status');
+  el.className = `toast-enter max-w-sm w-full sm:w-96 bg-white dark:bg-slate-800 border ${colors[type]||colors.info} rounded-xl shadow-soft px-4 py-3 flex items-start gap-3`;
+  el.innerHTML = `<i class="fa-solid ${icons[type]||icons.info} mt-0.5"></i><p class="text-sm flex-1 text-slate-700 dark:text-slate-200">${message}</p><button aria-label="Tutup" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>`;
+  let dismissed = false;
+  const dismiss = () => { if (dismissed) return; dismissed = true; el.classList.remove('toast-enter'); el.classList.add('toast-exit'); setTimeout(()=>el.remove(),200); };
+  el.querySelector('button').addEventListener('click', dismiss);
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(dismiss, 4200);
+}
+
+// ---------- API ----------
+async function api(path, options = {}) {
+  const res = await fetch('/api' + path, { credentials:'same-origin', headers:{'Content-Type':'application/json'}, ...options });
+  if (res.status === 401) { location.href = '/login?next=' + encodeURIComponent(location.pathname + location.search); throw new Error('unauthorized'); }
+  let body = {}; try { body = await res.json(); } catch(e){}
+  if (!res.ok || !body.success) { const err = new Error(body.message || 'Terjadi kesalahan'); err.status = res.status; err.details = body.details; throw err; }
+  return body.data;
+}
+
+function escapeHtml(str) { return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '-'; }
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  try { await api('/auth/logout', { method: 'POST' }); } catch(e){}
+  location.href = '/login';
+});
+
+// ---------- Double-submit guard ----------
+function guardSubmit(button, fn) {
+  return async (...args) => {
+    if (button.dataset.busy === '1') return;
+    button.dataset.busy = '1';
+    button.disabled = true;
+    const original = button.innerHTML;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Memproses...</span>';
+    try { await fn(...args); }
+    finally { button.dataset.busy = '0'; button.disabled = false; button.innerHTML = original; }
+  };
+}
+
+// ---------- Modal ----------
+function openModal(title, bodyHtml) {
+  document.getElementById('modalTitle').innerHTML = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+  setTimeout(() => { const f = document.querySelector('#modalBody input, #modalBody textarea, #modalBody select'); if (f) f.focus(); }, 60);
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+  document.getElementById('modalBody').innerHTML = '';
+}
+document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !document.getElementById('modalOverlay').classList.contains('hidden')) closeModal(); });
+
+function confirmDelete(message, onConfirm) {
+  openModal('Konfirmasi Hapus', `
+    <p class="text-sm text-slate-600 dark:text-slate-300 mb-5">${escapeHtml(message)}</p>
+    <div class="grid grid-cols-2 gap-3">
+      <button id="cdCancel" type="button" class="rounded-xl border border-slate-200 dark:border-slate-700 font-semibold py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Batal</button>
+      <button id="cdConfirm" type="button" class="rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2.5 transition">Hapus</button>
+    </div>`);
+  document.getElementById('cdCancel').addEventListener('click', closeModal);
+  document.getElementById('cdConfirm').addEventListener('click', guardSubmit(document.getElementById('cdConfirm'), async () => {
+    try { await onConfirm(); closeModal(); } catch (e) { showToast(e.message || 'Gagal menghapus', 'error'); }
+  }));
+}
+
+function loadingSkeleton() {
+  return `<div class="space-y-3"><div class="skeleton h-8 w-1/3 rounded-lg"></div><div class="skeleton h-24 rounded-2xl"></div><div class="skeleton h-24 rounded-2xl"></div></div>`;
+}
+function errorBlock(message) {
+  return `<div class="text-center py-16"><i class="fa-regular fa-face-frown text-4xl text-slate-300 dark:text-slate-600 mb-3"></i><p class="text-slate-500 dark:text-slate-400">${escapeHtml(message)}</p></div>`;
+}
+function emptyBlock(message, icon = 'fa-inbox') {
+  return `<div class="text-center py-14 text-slate-400"><i class="fa-solid ${icon} text-3xl mb-2"></i><p class="text-sm">${escapeHtml(message)}</p></div>`;
+}
+
+// =========================================================
+// ROUTER
+// =========================================================
+const SECTIONS = [
+  { key:'dashboard', label:'Dashboard', icon:'fa-gauge-high' },
+  { key:'lessons', label:'Lessons', icon:'fa-book' },
+  { key:'materials', label:'Materials', icon:'fa-file-lines' },
+  { key:'grammar', label:'Grammar', icon:'fa-diagram-project' },
+  { key:'vocabulary', label:'Vocabulary', icon:'fa-spell-check' },
+  { key:'kanji', label:'Kanji', icon:'fa-language' },
+  { key:'questions', label:'Questions', icon:'fa-circle-question' },
+  { key:'import', label:'Import', icon:'fa-file-import' },
+  { key:'statistics', label:'Statistics', icon:'fa-chart-line' },
+];
+const SECTION_KEYS = SECTIONS.map(s => s.key);
+
+function currentSection() {
+  const s = new URLSearchParams(location.search).get('section');
+  return SECTION_KEYS.includes(s) ? s : 'dashboard';
+}
+
+function renderTabs(active) {
+  document.getElementById('sectionTabs').innerHTML = SECTIONS.map(s => `
+    <button data-section="${s.key}" class="section-tab ${s.key === active ? 'tab-active' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300'} rounded-full px-3.5 py-1.5 text-sm font-semibold flex items-center gap-1.5 transition">
+      <i class="fa-solid ${s.icon} text-xs"></i> ${s.label}
+    </button>`).join('');
+  document.querySelectorAll('.section-tab').forEach(btn => btn.addEventListener('click', () => navigateSection(btn.dataset.section)));
+}
+
+function navigateSection(section, push = true) {
+  if (push) history.pushState({ section }, '', `/admin?section=${section}`);
+  renderTabs(section);
+  renderSection(section);
+}
+
+window.addEventListener('popstate', () => {
+  const s = currentSection();
+  renderTabs(s);
+  renderSection(s);
+});
+
+async function renderSection(section) {
+  const el = document.getElementById('sectionContent');
+  el.innerHTML = loadingSkeleton();
+  try {
+    if (section === 'dashboard') await renderDashboard(el);
+    else if (section === 'lessons') await renderLessons(el);
+    else if (section === 'materials') await renderMaterials(el);
+    else if (['grammar','vocabulary','kanji'].includes(section)) await renderContentType(el, section);
+    else if (section === 'questions') await renderQuestions(el);
+    else if (section === 'import') await renderImport(el);
+    else if (section === 'statistics') await renderStatistics(el);
+  } catch (e) {
+    el.innerHTML = errorBlock(e.message || 'Gagal memuat data');
+  }
+}
+
+// ---------- Shared lesson cache ----------
+let lessonsCache = null;
+async function getLessons(force = false) {
+  if (lessonsCache && !force) return lessonsCache;
+  lessonsCache = await api('/lessons');
+  return lessonsCache;
+}
+
+function lessonSelectOptions(lessons, selectedId) {
+  return lessons.map(l => `<option value="${l.id}" ${String(l.id) === String(selectedId) ? 'selected' : ''}>${escapeHtml(l.title)}</option>`).join('');
+}
+
+// =========================================================
+// DASHBOARD
+// =========================================================
+async function renderDashboard(el) {
+  const [lessons, materials, grammar, vocabulary, kanji, questions, mistakes] = await Promise.all([
+    getLessons(true), api('/materials'), api('/grammar'), api('/vocabulary'), api('/kanji'), api('/questions'), api('/mistakes'),
+  ]);
+  const cards = [
+    { label: 'Lessons', value: lessons.length, icon: 'fa-book' },
+    { label: 'Study Materials', value: materials.length, icon: 'fa-file-lines' },
+    { label: 'Grammar', value: grammar.length, icon: 'fa-diagram-project' },
+    { label: 'Vocabulary', value: vocabulary.length, icon: 'fa-spell-check' },
+    { label: 'Kanji', value: kanji.length, icon: 'fa-language' },
+    { label: 'Questions', value: questions.length, icon: 'fa-circle-question' },
+  ];
+  const latestLessons = lessons.slice(0, 5);
+  const latestQuestions = questions.slice(0, 5);
+  const recentMistakes = mistakes.slice(0, 5);
+
+  el.innerHTML = `
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+      ${cards.map(c => `
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4">
+          <div class="h-9 w-9 rounded-xl bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-300 flex items-center justify-center mb-2"><i class="fa-solid ${c.icon}"></i></div>
+          <p class="font-display text-2xl font-bold">${c.value}</p>
+          <p class="text-xs text-slate-400">${c.label}</p>
+        </div>`).join('')}
+    </div>
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-1">
+        <h2 class="font-display font-bold text-lg mb-3">Latest Lessons</h2>
+        <div class="space-y-2">
+          ${latestLessons.length ? latestLessons.map(l => `
+            <div class="rounded-xl bg-white dark:bg-slate-800 shadow-softer p-3">
+              <p class="font-semibold text-sm">${escapeHtml(l.title)}</p>
+              <p class="text-xs text-slate-400">${fmtDate(l.study_date)}</p>
+            </div>`).join('') : emptyBlock('Belum ada lesson')}
+        </div>
+      </div>
+      <div class="lg:col-span-1">
+        <h2 class="font-display font-bold text-lg mb-3">Latest Questions</h2>
+        <div class="space-y-2">
+          ${latestQuestions.length ? latestQuestions.map(q => `
+            <div class="rounded-xl bg-white dark:bg-slate-800 shadow-softer p-3">
+              <p class="text-sm line-clamp-2">${escapeHtml(q.question_text)}</p>
+              <span class="badge bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-300 mt-1">${q.content_type}</span>
+            </div>`).join('') : emptyBlock('Belum ada question')}
+        </div>
+      </div>
+      <div class="lg:col-span-1">
+        <h2 class="font-display font-bold text-lg mb-3">Recent Mistakes</h2>
+        <div class="space-y-2">
+          ${recentMistakes.length ? recentMistakes.map(m => `
+            <div class="rounded-xl bg-white dark:bg-slate-800 shadow-softer p-3">
+              <p class="text-sm line-clamp-2">${escapeHtml(m.question_text)}</p>
+              <p class="text-xs text-rose-500 mt-1">Salah: ${m.wrong_answer.toUpperCase()} | Benar: ${m.correct_answer.toUpperCase()}</p>
+            </div>`).join('') : emptyBlock('Belum ada kesalahan tercatat', 'fa-face-smile')}
+        </div>
+      </div>
+    </div>`;
+}
+
+// =========================================================
+// LESSONS
+// =========================================================
+async function renderLessons(el) {
+  const lessons = await getLessons(true);
+  el.innerHTML = `
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display font-bold text-xl">Lessons</h2>
+      <button id="addLessonBtn" class="rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold px-4 py-2 flex items-center gap-2 shadow-softer transition"><i class="fa-solid fa-plus"></i> Lesson</button>
+    </div>
+    <div id="lessonListWrap" class="grid sm:grid-cols-2 gap-3">
+      ${lessons.length ? lessons.map(l => lessonCard(l)).join('') : emptyBlock('Belum ada lesson. Klik "+ Lesson" untuk membuat.')}
+    </div>`;
+  
+  document.getElementById('addLessonBtn').addEventListener('click', () => openLessonForm());
+  bindLessonCardEvents();
+}
+
+function lessonCard(l) {
+  // FITUR BARU: Tambahan tombol download / export ke format JSON
+  return `
+    <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4" data-id="${l.id}">
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0">
+          <p class="font-display font-bold">${escapeHtml(l.title)}</p>
+          <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-calendar"></i> ${fmtDate(l.study_date)}</p>
+          ${l.description ? `<p class="text-sm text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">${escapeHtml(l.description)}</p>` : ''}
+        </div>
+        <div class="flex gap-1 shrink-0">
+          <button data-export="${l.id}" aria-label="Export JSON" title="Download data lesson untuk AI Prompting" class="h-8 w-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-download text-xs"></i></button>
+          <button data-edit="${l.id}" aria-label="Edit" class="h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300"><i class="fa-solid fa-pen text-xs"></i></button>
+          <button data-del="${l.id}" aria-label="Hapus" class="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-950/40 flex items-center justify-center text-rose-500"><i class="fa-solid fa-trash text-xs"></i></button>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <a href="/study?lesson_id=${l.id}" class="flex-1 text-center text-xs font-semibold rounded-lg bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-300 py-1.5"><i class="fa-solid fa-book-open"></i> Study</a>
+        <a href="/quiz?lesson_id=${l.id}" class="flex-1 text-center text-xs font-semibold rounded-lg bg-primary-500 text-white py-1.5"><i class="fa-solid fa-play"></i> Quiz</a>
+      </div>
+    </div>`;
+}
+
+function bindLessonCardEvents() {
+  document.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', async () => {
+    const lessons = await getLessons();
+    openLessonForm(lessons.find(l => String(l.id) === btn.dataset.edit));
+  }));
+  document.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => {
+    confirmDelete('Lesson beserta seluruh material, grammar, vocabulary, kanji, dan question di dalamnya akan terhapus permanen. Lanjutkan?', async () => {
+      await api(`/lessons/${btn.dataset.del}`, { method: 'DELETE' });
+      showToast('Lesson berhasil dihapus', 'success');
+      renderSection('lessons');
+    });
+  }));
+
+  // FITUR BARU: Logic saat tombol download/export JSON diklik
+  document.querySelectorAll('[data-export]').forEach(btn => btn.addEventListener('click', async () => {
+    const lessonId = btn.dataset.export;
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i>';
+    btn.disabled = true;
+    
+    try {
+      // 1. Ambil seluruh data dari endpoint backend
+      const data = await api(`/lessons/${lessonId}/export`);
+      
+      // 2. Buat objek JSON dan bentuk sebagai BLOB (Binary Large Object)
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      // 3. Simulasikan klik pada elemen link <a> untuk mengunduh otomatis
+      const a = document.createElement('a');
+      a.href = url;
+      
+      // 4. Buat nama file rapi tanpa karakter aneh
+      const safeTitle = data.lesson.title.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+      a.download = `lesson_${lessonId}_${safeTitle}.json`;
+      
+      document.body.appendChild(a);
+      a.click();
+      
+      // 5. Bersihkan link
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showToast('Data berhasil didownload! Siap dipakai untuk prompt Gemini.', 'success');
+    } catch (e) {
+      showToast(e.message || 'Gagal mengekspor data', 'error');
+    } finally {
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
+    }
+  }));
+}
+
+function openLessonForm(existing) {
+  const isEdit = !!existing;
+  openModal(isEdit ? 'Edit Lesson' : 'Lesson Baru', `
+    <form id="lessonForm" class="space-y-4">
+      <div><label class="field-label">Judul</label><input name="title" required class="field-input" value="${existing ? escapeHtml(existing.title) : ''}" placeholder="N3 Day 01"></div>
+      <div><label class="field-label">Deskripsi</label><textarea name="description" rows="3" class="field-input">${existing ? escapeHtml(existing.description || '') : ''}</textarea></div>
+      <div><label class="field-label">Tanggal Belajar</label><input type="date" name="study_date" class="field-input" value="${existing && existing.study_date ? String(existing.study_date).slice(0,10) : ''}"></div>
+      <button type="submit" class="w-full rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2.5 shadow-soft transition">${isEdit ? 'Simpan Perubahan' : 'Buat Lesson'}</button>
+      <button type="button" onclick="closeModal()" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 font-semibold py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Tutup</button>
+    </form>`);
+  const form = document.getElementById('lessonForm');
+  const submitBtn = form.querySelector('button[type=submit]');
+  form.addEventListener('submit', guardSubmit(submitBtn, async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const payload = { title: fd.get('title').trim(), description: fd.get('description').trim() || null, study_date: fd.get('study_date') || null };
+    try {
+      if (isEdit) await api(`/lessons/${existing.id}`, { method: 'PUT', body: JSON.stringify(payload) });
+      else await api('/lessons', { method: 'POST', body: JSON.stringify(payload) });
+      showToast(isEdit ? 'Lesson berhasil diperbarui' : 'Lesson berhasil dibuat', 'success');
+      closeModal();
+      renderSection('lessons');
+    } catch (err) { showToast(err.message, 'error'); }
+  }));
+}
+
+// =========================================================
+// GENERIC CONTENT CRUD (Grammar, Vocabulary, Kanji with Quill)
+// =========================================================
+const CONTENT_CONFIGS = {
+  grammar: { label: 'Grammar', icon: 'fa-diagram-project', primary: r => r.pattern, secondary: r => r.meaning },
+  vocabulary: { label: 'Vocabulary', icon: 'fa-spell-check', primary: r => r.word, secondary: r => (r.reading ? r.reading + ' | ' : '') + r.meaning },
+  kanji: { label: 'Kanji', icon: 'fa-language', primary: r => r.character, secondary: r => r.meaning },
+};
+let contentFilterLesson = { grammar: null, vocabulary: null, kanji: null };
+let activeContentQuill = null;
+
+async function renderContentType(el, type) {
+  const cfg = CONTENT_CONFIGS[type];
+  const lessons = await getLessons();
+  if (!contentFilterLesson[type] && lessons.length) contentFilterLesson[type] = lessons[0].id;
+  
+  el.innerHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="font-display font-bold text-xl">${cfg.label}</h2>
+      <div class="flex items-center gap-2">
+        <select id="ctLessonFilter" class="field-input !w-auto text-sm" ${lessons.length ? '' : 'disabled'}>
+          ${lessons.length ? lessonSelectOptions(lessons, contentFilterLesson[type]) : '<option>Belum ada lesson</option>'}
+        </select>
+        <button id="ctAddBtn" ${lessons.length ? '' : 'disabled'} class="rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 flex items-center gap-2 shadow-softer transition"><i class="fa-solid fa-plus"></i> ${cfg.label}</button>
+      </div>
+    </div>
+    <div id="ctList" class="grid sm:grid-cols-2 gap-3">${loadingSkeleton()}</div>`;
+  
+  if (!lessons.length) {
+    document.getElementById('ctList').innerHTML = emptyBlock('Buat lesson terlebih dahulu di section Lessons.');
+    return;
+  }
+  
+  document.getElementById('ctLessonFilter').addEventListener('change', (e) => {
+    contentFilterLesson[type] = e.target.value;
+    loadContentList(type, cfg);
+  });
+  
+  document.getElementById('ctAddBtn').addEventListener('click', () => openContentForm(type, cfg, lessons));
+  await loadContentList(type, cfg);
+}
+
+async function loadContentList(type, cfg) {
+  const listEl = document.getElementById('ctList');
+  listEl.innerHTML = loadingSkeleton();
+  try {
+    const rows = await api(`/${type}?lesson_id=${contentFilterLesson[type]}`);
+    listEl.innerHTML = rows.length ? rows.map(r => `
+      <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <p class="font-display text-lg font-bold">${escapeHtml(cfg.primary(r))}</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">${escapeHtml(cfg.secondary(r))}</p>
+            ${type === 'grammar' && r.explanation ? `<div class="text-xs text-slate-400 mt-2 line-clamp-2">${r.explanation}</div>` : (r.example_sentence ? `<p class="text-xs text-slate-400 mt-2 line-clamp-2">${escapeHtml(r.example_sentence)}</p>` : '')}
+          </div>
+          <div class="flex gap-1 shrink-0">
+            <button data-edit="${r.id}" aria-label="Edit" class="h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300"><i class="fa-solid fa-pen text-xs"></i></button>
+            <button data-del="${r.id}" aria-label="Hapus" class="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-950/40 flex items-center justify-center text-rose-500"><i class="fa-solid fa-trash text-xs"></i></button>
+          </div>
+        </div>
+      </div>`).join('') : emptyBlock(`Lesson ini belum punya ${cfg.label.toLowerCase()}.`);
+    
+    const lessons = await getLessons();
+    listEl.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => {
+      openContentForm(type, cfg, lessons, rows.find(r => String(r.id) === btn.dataset.edit));
+    }));
+    listEl.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => {
+      confirmDelete(`Hapus ${cfg.label.toLowerCase()} ini? Question yang mereferensikannya juga akan ikut terhapus.`, async () => {
+        await api(`/${type}/${btn.dataset.del}`, { method: 'DELETE' });
+        showToast(`${cfg.label} berhasil dihapus`, 'success');
+        loadContentList(type, cfg);
+      });
+    }));
+  } catch (e) { listEl.innerHTML = errorBlock(e.message); }
+}
+
+function openContentForm(type, cfg, lessons, existing) {
+  const isEdit = !!existing;
+  let initialQuillContent = '';
+  
+  if (existing) {
+    if (type === 'vocabulary') {
+      initialQuillContent = [
+        existing.word || '',
+        existing.reading || '',
+        existing.meaning || '',
+        existing.example_sentence || '',
+        existing.example_translation || ''
+      ].filter(Boolean).join('<br>');
+    } else if (type === 'kanji') {
+      initialQuillContent = [
+        existing.character || '',
+        existing.onyomi || '',
+        existing.meaning || '',
+        existing.example_word || '',
+        existing.example_reading || ''
+      ].filter(Boolean).join('<br>');
+    } else if (type === 'grammar') {
+      initialQuillContent = existing.explanation || '';
+    }
+  }
+
+  openModal(isEdit ? `Edit ${cfg.label}` : `${cfg.label} Baru`, `
+    <form id="ctForm" class="space-y-4">
+      <div><label class="field-label">Lesson *</label>
+        <select name="lesson_id" required class="field-input">${lessonSelectOptions(lessons, existing ? existing.lesson_id : contentFilterLesson[type])}</select>
+      </div>
+      ${type === 'grammar' ? `
+        <div><label class="field-label">Pattern *</label><input name="pattern" type="text" required class="field-input" value="${existing ? escapeHtml(existing.pattern||'') : ''}"></div>
+        <div><label class="field-label">Meaning *</label><input name="meaning" type="text" required class="field-input" value="${existing ? escapeHtml(existing.meaning||'') : ''}"></div>
+        <div>
+          <label class="field-label">Explanation & Contoh Kalimat (Rich Editor) *</label>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+            <div id="quillContent">${initialQuillContent}</div>
+          </div>
+        </div>
+      ` : type === 'vocabulary' ? `
+        <div>
+          <label class="field-label">Input Vocabulary (Tekan Enter untuk baris baru) *</label>
+          <p class="text-xs text-slate-400 mb-1.5">Baris 1: Word | Baris 2: Reading | Baris 3: Meaning | Baris 4: Example Sentence | Baris 5: Example Translation</p>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+            <div id="quillContent">${initialQuillContent}</div>
+          </div>
+        </div>
+      ` : `
+        <div>
+          <label class="field-label">Input Kanji (Tekan Enter untuk baris baru) *</label>
+          <p class="text-xs text-slate-400 mb-1.5">Baris 1: Character ( ) | Baris 2: Reading ( ) | Baris 3: Meaning (Membaca) | Baris 4: Example Word/Sentence ( ) | Baris 5: Example Reading/Translation (Membaca buku)</p>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+            <div id="quillContent">${initialQuillContent}</div>
+          </div>
+        </div>
+      `}
+      <button type="submit" class="w-full rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2.5 shadow-soft transition">${isEdit ? 'Simpan Perubahan' : 'Simpan'}</button>
+      <button type="button" onclick="closeModal()" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 font-semibold py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Tutup</button>
+    </form>`);
+
+  activeContentQuill = new Quill('#quillContent', {
+    theme: 'snow',
+    placeholder: type === 'grammar' ? 'Tulis penjelasan grammar...' : 'Ketik baris per baris...',
+    modules: { toolbar: type === 'grammar' ? [
+      [{ header: [1,2,3,false] }], ['bold','italic','underline','strike'],
+      [{ list:'ordered' }, { list:'bullet' }], ['blockquote','code-block','link'],
+      [{ align: [] }], ['clean'],
+    ] : false },
+  });
+
+  const form = document.getElementById('ctForm');
+  const submitBtn = form.querySelector('button[type=submit]');
+  
+  form.addEventListener('submit', guardSubmit(submitBtn, async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const payload = { lesson_id: fd.get('lesson_id') };
+    
+    if (type === 'grammar') {
+      payload.pattern = fd.get('pattern').trim();
+      payload.meaning = fd.get('meaning').trim();
+      payload.explanation = activeContentQuill ? activeContentQuill.root.innerHTML : null;
+    } else if (type === 'vocabulary') {
+      const text = activeContentQuill.getText();
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      payload.word = lines[0] || '';
+      payload.reading = lines[1] || '';
+      payload.meaning = lines[2] || '';
+      payload.example_sentence = lines[3] || '';
+      payload.example_translation = lines[4] || '';
+      if (!payload.word || !payload.meaning) {
+        showToast('Word dan Meaning wajib diisi (minimal baris 1 dan 3)', 'warning');
+        return;
+      }
+    } else if (type === 'kanji') {
+      const text = activeContentQuill.getText();
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      payload.character = lines[0] || '';
+      payload.onyomi = lines[1] || '';
+      payload.meaning = lines[2] || '';
+      payload.example_word = lines[3] || '';
+      payload.example_reading = lines[4] || '';
+      payload.kunyomi = null;
+      payload.example_sentence = null;
+      if (!payload.character || !payload.meaning) {
+        showToast('Character dan Meaning wajib diisi', 'warning');
+        return;
+      }
+    }
+
+    try {
+      if (isEdit) await api(`/${type}/${existing.id}`, { method: 'PUT', body: JSON.stringify(payload) });
+      else await api(`/${type}`, { method: 'POST', body: JSON.stringify(payload) });
+      showToast(isEdit ? `${cfg.label} berhasil diperbarui` : `${cfg.label} berhasil ditambahkan`, 'success');
+      closeModal();
+      contentFilterLesson[type] = payload.lesson_id;
+      renderSection(type);
+    } catch (err) { showToast(err.message, 'error'); }
+  }));
+}
+
+// =========================================================
+// STUDY MATERIALS
+// =========================================================
+const MATERIAL_TYPES = ['grammar','vocabulary','kanji','reading','note','general'];
+let materialFilterLesson = null;
+let activeQuill = null;
+
+async function renderMaterials(el) {
+  const lessons = await getLessons();
+  if (!materialFilterLesson && lessons.length) materialFilterLesson = lessons[0].id;
+  
+  el.innerHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="font-display font-bold text-xl">Study Materials</h2>
+      <div class="flex items-center gap-2">
+        <select id="matLessonFilter" class="field-input !w-auto text-sm" ${lessons.length ? '' : 'disabled'}>
+          ${lessons.length ? lessonSelectOptions(lessons, materialFilterLesson) : '<option>Belum ada lesson</option>'}
+        </select>
+        <button id="matAddBtn" ${lessons.length ? '' : 'disabled'} class="rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 flex items-center gap-2 shadow-softer transition"><i class="fa-solid fa-plus"></i> Material</button>
+      </div>
+    </div>
+    <p class="text-xs text-slate-400 mb-4"><i class="fa-solid fa-circle-info"></i> Study Material bersifat opsional   lesson tetap valid tanpanya.</p>
+    <div id="matList" class="space-y-3">${loadingSkeleton()}</div>`;
+    
+  if (!lessons.length) { document.getElementById('matList').innerHTML = emptyBlock('Buat lesson terlebih dahulu.'); return; }
+  
+  document.getElementById('matLessonFilter').addEventListener('change', (e) => { materialFilterLesson = e.target.value; loadMaterialsList(); });
+  document.getElementById('matAddBtn').addEventListener('click', () => openMaterialForm(lessons));
+  await loadMaterialsList();
+}
+
+async function loadMaterialsList() {
+  const listEl = document.getElementById('matList');
+  listEl.innerHTML = loadingSkeleton();
+  try {
+    const rows = await api(`/materials?lesson_id=${materialFilterLesson}`);
+    listEl.innerHTML = rows.length ? rows.map(m => `
+      <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 mb-1"><span class="badge bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-300">${m.material_type}</span><span class="text-xs text-slate-400">#${m.order_index}</span></div>
+            <p class="font-display font-bold">${escapeHtml(m.title)}</p>
+            <div class="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">${m.content_html}</div>
+          </div>
+          <div class="flex gap-1 shrink-0">
+            <button data-edit="${m.id}" aria-label="Edit" class="h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300"><i class="fa-solid fa-pen text-xs"></i></button>
+            <button data-del="${m.id}" aria-label="Hapus" class="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-950/40 flex items-center justify-center text-rose-500"><i class="fa-solid fa-trash text-xs"></i></button>
+          </div>
+        </div>
+      </div>`).join('') : emptyBlock('Lesson ini belum punya study material.');
+      
+    const lessons = await getLessons();
+    listEl.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => openMaterialForm(lessons, rows.find(r => String(r.id) === btn.dataset.edit))));
+    listEl.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => {
+      confirmDelete('Hapus study material ini?', async () => {
+        await api(`/materials/${btn.dataset.del}`, { method: 'DELETE' });
+        showToast('Study material berhasil dihapus', 'success');
+        loadMaterialsList();
+      });
+    }));
+  } catch (e) { listEl.innerHTML = errorBlock(e.message); }
+}
+
+function openMaterialForm(lessons, existing) {
+  const isEdit = !!existing;
+  openModal(isEdit ? 'Edit Study Material' : 'Study Material Baru', `
+    <form id="matForm" class="space-y-4">
+      <div><label class="field-label">Lesson *</label><select name="lesson_id" required class="field-input">${lessonSelectOptions(lessons, existing ? existing.lesson_id : materialFilterLesson)}</select></div>
+      <div><label class="field-label">Judul *</label><input name="title" required class="field-input" value="${existing ? escapeHtml(existing.title) : ''}"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="field-label">Tipe</label><select name="material_type" class="field-input">${MATERIAL_TYPES.map(t => `<option value="${t}" ${existing && existing.material_type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+        <div><label class="field-label">Urutan</label><input name="order_index" type="number" min="0" class="field-input" value="${existing ? existing.order_index : 0}"></div>
+      </div>
+      <div>
+        <label class="field-label">Konten *</label>
+        <div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+          <div id="quillEditor">${existing ? existing.content_html : ''}</div>
+        </div>
+      </div>
+      <button type="submit" class="w-full rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2.5 shadow-soft transition">${isEdit ? 'Simpan Perubahan' : 'Simpan'}</button>
+      <button type="button" onclick="closeModal()" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 font-semibold py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Tutup</button>
+    </form>`);
+    
+  activeQuill = new Quill('#quillEditor', {
+    theme: 'snow',
+    placeholder: 'Tulis materi di sini...',
+    modules: { toolbar: [
+      [{ header: [1,2,3,false] }], ['bold','italic','underline','strike'],
+      [{ list:'ordered' }, { list:'bullet' }], ['blockquote','code-block','link'],
+      [{ align: [] }], ['clean'],
+    ]},
+  });
+
+  const form = document.getElementById('matForm');
+  const submitBtn = form.querySelector('button[type=submit]');
+  
+  form.addEventListener('submit', guardSubmit(submitBtn, async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const contentHtml = activeQuill.root.innerHTML;
+    if (activeQuill.getText().trim().length === 0) { showToast('Konten tidak boleh kosong', 'warning'); return; }
+    
+    const payload = {
+      lesson_id: fd.get('lesson_id'), title: fd.get('title').trim(),
+      material_type: fd.get('material_type'), order_index: Number(fd.get('order_index')) || 0,
+      content_html: contentHtml,
+    };
+    
+    try {
+      if (isEdit) await api(`/materials/${existing.id}`, { method: 'PUT', body: JSON.stringify(payload) });
+      else await api('/materials', { method: 'POST', body: JSON.stringify(payload) });
+      showToast(isEdit ? 'Material berhasil diperbarui' : 'Material berhasil ditambahkan', 'success');
+      closeModal();
+      materialFilterLesson = payload.lesson_id;
+      renderSection('materials');
+    } catch (err) { showToast(err.message, 'error'); }
+  }));
+}
+
+// =========================================================
+// QUESTIONS
+// =========================================================
+const QUESTION_TYPES = ['meaning','reading','usage','context','grammar_selection','sentence_completion','kanji_reading','kanji_meaning','vocabulary_reading','vocabulary_meaning','similar_word_discrimination'];
+const DIFFICULTIES = ['easy','medium','hard'];
+let questionFilterLesson = null;
+
+function questionTypeLabel(t) { return t.split('_').map(w => w[0].toUpperCase()+w.slice(1)).join(' '); }
+
+async function renderQuestions(el) {
+  const lessons = await getLessons();
+  if (!questionFilterLesson && lessons.length) questionFilterLesson = lessons[0].id;
+  
+  el.innerHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="font-display font-bold text-xl">Questions</h2>
+      <div class="flex items-center gap-2">
+        <select id="qLessonFilter" class="field-input !w-auto text-sm" ${lessons.length ? '' : 'disabled'}>
+          ${lessons.length ? lessonSelectOptions(lessons, questionFilterLesson) : '<option>Belum ada lesson</option>'}
+        </select>
+        <button id="qAddBtn" ${lessons.length ? '' : 'disabled'} class="rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 flex items-center gap-2 shadow-softer transition"><i class="fa-solid fa-plus"></i> Question</button>
+      </div>
+    </div>
+    <div id="qList" class="space-y-3">${loadingSkeleton()}</div>`;
+    
+  if (!lessons.length) { document.getElementById('qList').innerHTML = emptyBlock('Buat lesson terlebih dahulu.'); return; }
+  
+  document.getElementById('qLessonFilter').addEventListener('change', (e) => { questionFilterLesson = e.target.value; loadQuestionsList(); });
+  document.getElementById('qAddBtn').addEventListener('click', () => openQuestionForm(lessons));
+  await loadQuestionsList();
+}
+
+async function loadQuestionsList() {
+  const listEl = document.getElementById('qList');
+  listEl.innerHTML = loadingSkeleton();
+  try {
+    const rows = await api(`/questions?lesson_id=${questionFilterLesson}`);
+    listEl.innerHTML = rows.length ? rows.map(q => `
+      <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
+              <span class="badge bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-300">${q.content_type}</span>
+              <span class="badge bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300">${questionTypeLabel(q.question_type)}</span>
+              <span class="badge bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">${q.difficulty}</span>
+              <span class="badge bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">${q.points} pts</span>
+            </div>
+            <p class="text-sm font-medium">${escapeHtml(q.question_text)}</p>
+            <p class="text-xs text-slate-400 mt-1">Jawaban benar: <span class="font-bold uppercase">${q.correct_answer}</span></p>
+          </div>
+          <div class="flex gap-1 shrink-0">
+            <button data-edit="${q.id}" aria-label="Edit" class="h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300"><i class="fa-solid fa-pen text-xs"></i></button>
+            <button data-del="${q.id}" aria-label="Hapus" class="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-950/40 flex items-center justify-center text-rose-500"><i class="fa-solid fa-trash text-xs"></i></button>
+          </div>
+        </div>
+      </div>`).join('') : emptyBlock('Lesson ini belum punya question.');
+      
+    const lessons = await getLessons();
+    listEl.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => openQuestionForm(lessons, rows.find(r => String(r.id) === btn.dataset.edit))));
+    listEl.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => {
+      confirmDelete('Hapus question ini? Riwayat quiz_attempts terkait juga akan terhapus.', async () => {
+        await api(`/questions/${btn.dataset.del}`, { method: 'DELETE' });
+        showToast('Question berhasil dihapus', 'success');
+        loadQuestionsList();
+      });
+    }));
+  } catch (e) { listEl.innerHTML = errorBlock(e.message); }
+}
+
+async function refreshContentRefOptions(lessonId, contentType, selectedId) {
+  const sel = document.getElementById('qContentRef');
+  sel.innerHTML = '<option value="">Memuat...</option>';
+  try {
+    const rows = await api(`/${contentType}?lesson_id=${lessonId}`);
+    const cfg = CONTENT_CONFIGS[contentType];
+    sel.innerHTML = rows.length
+      ? rows.map(r => `<option value="${r.id}" ${String(r.id)===String(selectedId)?'selected':''}>${escapeHtml(cfg.primary(r))} | ${escapeHtml(cfg.secondary(r))}</option>`).join('')
+      : '<option value="">Belum ada data   tambahkan dulu</option>';
+  } catch (e) { sel.innerHTML = '<option value="">Gagal memuat</option>'; }
+}
+
+function openQuestionForm(lessons, existing) {
+  const isEdit = !!existing;
+  const lessonId = existing ? existing.lesson_id : questionFilterLesson;
+  
+  openModal(isEdit ? 'Edit Question' : 'Question Baru', `
+    <form id="qForm" class="space-y-4">
+      <div><label class="field-label">Lesson *</label>
+        <select name="lesson_id" ${isEdit ? 'disabled' : 'required'} class="field-input">${lessonSelectOptions(lessons, lessonId)}</select>
+        ${isEdit ? `<input type="hidden" name="lesson_id" value="${lessonId}">` : ''}
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="field-label">Content Type *</label>
+          <select id="qContentType" name="content_type" required class="field-input">
+            ${['grammar','vocabulary','kanji'].map(t => `<option value="${t}" ${existing && existing.content_type===t?'selected':''}>${CONTENT_CONFIGS[t].label}</option>`).join('')}
+          </select>
+        </div>
+        <div><label class="field-label">Content Reference *</label>
+          <select id="qContentRef" name="content_id" required class="field-input"><option>Memuat...</option></select>
+        </div>
+      </div>
+      <div><label class="field-label">Question Type *</label>
+        <select name="question_type" required class="field-input">${QUESTION_TYPES.map(t => `<option value="${t}" ${existing && existing.question_type===t?'selected':''}>${questionTypeLabel(t)}</option>`).join('')}</select>
+      </div>
+      <div><label class="field-label">Question Text *</label><textarea name="question_text" rows="2" required class="field-input">${existing ? escapeHtml(existing.question_text) : ''}</textarea></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="field-label">Option A *</label><input name="option_a" required class="field-input" value="${existing ? escapeHtml(existing.option_a) : ''}"></div>
+        <div><label class="field-label">Option B *</label><input name="option_b" required class="field-input" value="${existing ? escapeHtml(existing.option_b) : ''}"></div>
+        <div><label class="field-label">Option C *</label><input name="option_c" required class="field-input" value="${existing ? escapeHtml(existing.option_c) : ''}"></div>
+        <div><label class="field-label">Option D *</label><input name="option_d" required class="field-input" value="${existing ? escapeHtml(existing.option_d) : ''}"></div>
+      </div>
+      <div class="grid grid-cols-3 gap-3">
+        <div><label class="field-label">Correct Answer *</label>
+          <select name="correct_answer" required class="field-input">${['a','b','c','d'].map(k => `<option value="${k}" ${existing && existing.correct_answer===k?'selected':''}>${k.toUpperCase()}</option>`).join('')}</select>
+        </div>
+        <div><label class="field-label">Difficulty *</label>
+          <select name="difficulty" required class="field-input">${DIFFICULTIES.map(d => `<option value="${d}" ${existing && existing.difficulty===d?'selected':''}>${d}</option>`).join('')}</select>
+        </div>
+        <div><label class="field-label">Points</label><input name="points" type="number" min="1" class="field-input" value="${existing ? existing.points : 10}"></div>
+      </div>
+      <div><label class="field-label">Explanation *</label><textarea name="explanation" rows="2" required class="field-input">${existing ? escapeHtml(existing.explanation) : ''}</textarea></div>
+      <button type="submit" class="w-full rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2.5 shadow-soft transition">${isEdit ? 'Simpan Perubahan' : 'Simpan'}</button>
+      <button type="button" onclick="closeModal()" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 font-semibold py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Tutup</button>
+    </form>`);
+
+  const form = document.getElementById('qForm');
+  const lessonSelectEl = form.querySelector('select[name=lesson_id]:not([disabled])') || { value: lessonId };
+  const typeSelect = document.getElementById('qContentType');
+  
+  refreshContentRefOptions(lessonId, typeSelect.value, existing ? existing.content_id : null);
+  
+  typeSelect.addEventListener('change', () => refreshContentRefOptions(lessonSelectEl.value || lessonId, typeSelect.value, null));
+  if (!isEdit) {
+    form.querySelector('select[name=lesson_id]').addEventListener('change', (e) => refreshContentRefOptions(e.target.value, typeSelect.value, null));
+  }
+
+  const submitBtn = form.querySelector('button[type=submit]');
+  form.addEventListener('submit', guardSubmit(submitBtn, async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const payload = {
+      lesson_id: fd.get('lesson_id'), content_type: fd.get('content_type'), content_id: fd.get('content_id'),
+      question_type: fd.get('question_type'), question_text: fd.get('question_text').trim(),
+      option_a: fd.get('option_a').trim(), option_b: fd.get('option_b').trim(), option_c: fd.get('option_c').trim(), option_d: fd.get('option_d').trim(),
+      correct_answer: fd.get('correct_answer'), difficulty: fd.get('difficulty'), explanation: fd.get('explanation').trim(),
+      points: Number(fd.get('points')) || 10,
+    };
+    if (!payload.content_id) { showToast('Content reference wajib dipilih', 'warning'); return; }
+    
+    try {
+      if (isEdit) await api(`/questions/${existing.id}`, { method: 'PUT', body: JSON.stringify(payload) });
+      else await api('/questions', { method: 'POST', body: JSON.stringify(payload) });
+      showToast(isEdit ? 'Question berhasil diperbarui' : 'Question berhasil ditambahkan', 'success');
+      closeModal();
+      questionFilterLesson = payload.lesson_id;
+      renderSection('questions');
+    } catch (err) { showToast(err.message + (err.details ? ': ' + (Array.isArray(err.details) ? err.details.join(', ') : '') : ''), 'error'); }
+  }));
+}
+
+// =========================================================
+// QUESTION IMPORT
+// =========================================================
+let importState = { lessonId: null, parsed: null, validation: null };
+
+async function renderImport(el) {
+  const lessons = await getLessons();
+  if (!importState.lessonId && lessons.length) importState.lessonId = lessons[0].id;
+  
+  el.innerHTML = `
+    <h2 class="font-display font-bold text-xl mb-1">Import Questions</h2>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Alur: <strong>Copy JSON dari Gemini -> Paste -> Validate -> Preview -> Import</strong>.</p>
+    <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4 sm:p-5 space-y-4">
+      <div><label class="field-label">Lesson Tujuan *</label>
+        <select id="impLesson" class="field-input" ${lessons.length ? '' : 'disabled'}>${lessons.length ? lessonSelectOptions(lessons, importState.lessonId) : '<option>Belum ada lesson</option>'}</select>
+      </div>
+      <div>
+        <label class="field-label">Paste JSON Question</label>
+        <textarea id="impJson" rows="10" class="field-input font-mono text-xs" placeholder='[{"content_type":"vocabulary","content_reference":"...","question_type":"vocabulary_meaning","question_text":"...","option_a":"...","option_b":"...","option_c":"...","option_d":"...","correct_answer":"b","explanation":"...","difficulty":"medium","points":10}]'>${importState.rawJson || ''}</textarea>
+      </div>
+      <button id="impValidateBtn" ${lessons.length ? '' : 'disabled'} class="rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2.5 shadow-softer transition"><i class="fa-solid fa-magnifying-glass"></i> Validate & Preview</button>
+    </div>
+    <div id="impPreview" class="mt-6"></div>`;
+    
+  if (!lessons.length) return;
+  document.getElementById('impLesson').addEventListener('change', (e) => { importState.lessonId = e.target.value; });
+  
+  const validateBtn = document.getElementById('impValidateBtn');
+  validateBtn.addEventListener('click', guardSubmit(validateBtn, async () => {
+    const raw = document.getElementById('impJson').value.trim();
+    importState.rawJson = raw;
+    if (!raw) { showToast('Paste JSON terlebih dahulu', 'warning'); return; }
+    
+    let parsed;
+    try { parsed = JSON.parse(raw); } catch (e) { showToast('JSON tidak valid: ' + e.message, 'error'); return; }
+    if (!Array.isArray(parsed)) { showToast('JSON harus berupa array of question', 'error'); return; }
+    
+    importState.parsed = parsed;
+    try {
+      const result = await api('/questions/validate-import', { method: 'POST', body: JSON.stringify({ lesson_id: importState.lessonId, questions: parsed }) });
+      importState.validation = result;
+      renderImportPreview();
+    } catch (e) { showToast(e.message, 'error'); }
+  }));
+}
+
+function renderImportPreview() {
+  const r = importState.validation;
+  const el = document.getElementById('impPreview');
+  el.innerHTML = `
+    <div class="flex items-center gap-3 mb-4">
+      <span class="badge bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Total ${r.total}</span>
+      <span class="badge bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">Valid ${r.valid_count}</span>
+      <span class="badge bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">Invalid ${r.invalid_count}</span>
+    </div>
+    <div class="space-y-2 max-h-96 overflow-y-auto pr-1">
+      ${r.results.map(item => `
+        <div class="rounded-xl p-3 border ${item.valid ? 'border-emerald-200 dark:border-emerald-900 bg-emerald-50/50 dark:bg-emerald-950/20' : 'border-rose-200 dark:border-rose-900 bg-rose-50/50 dark:bg-rose-950/20'}">
+          <p class="text-sm font-semibold mb-1">#${item.index + 1} ${item.valid ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-solid fa-circle-xmark text-rose-500"></i>'}</p>
+          ${item.valid
+            ? `<p class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(item.resolved.question_text)}</p>`
+            : `<ul class="text-xs text-rose-600 dark:text-rose-400 list-disc pl-4">${item.errors.map(e => `<li>${escapeHtml(e)}</li>`).join('')}</ul>`}
+        </div>`).join('')}
+    </div>
+    <button id="impConfirmBtn" ${r.can_import ? '' : 'disabled'} class="mt-4 w-full rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 shadow-soft transition">
+      <i class="fa-solid fa-file-import"></i> ${r.can_import ? `Import ${r.valid_count} Question` : 'Perbaiki question yang invalid terlebih dahulu'}
+    </button>`;
+    
+  if (r.can_import) {
+    const btn = document.getElementById('impConfirmBtn');
+    btn.addEventListener('click', guardSubmit(btn, async () => {
+      try {
+        const res = await api('/questions/import', { method: 'POST', body: JSON.stringify({ lesson_id: importState.lessonId, questions: importState.parsed, confirm: true }) });
+        showToast(`${res.imported_count} question berhasil diimport`, 'success');
+        importState = { lessonId: importState.lessonId, parsed: null, validation: null, rawJson: '' };
+        renderSection('import');
+      } catch (e) { showToast(e.message, 'error'); }
+    }));
+  }
+}
+
+// =========================================================
+// STATISTICS
+// =========================================================
+let statsSubTab = 'overview';
+
+async function renderStatistics(el) {
+  el.innerHTML = `
+    <h2 class="font-display font-bold text-xl mb-4">Statistics</h2>
+    <div class="flex gap-1 border-b border-slate-200 dark:border-slate-700 mb-5 overflow-x-auto">
+      ${['overview','grammar','vocabulary','kanji','mistakes'].map(t => `
+        <button data-tab="${t}" class="stats-subtab px-4 py-2 text-sm font-semibold border-b-2 ${t===statsSubTab?'subtab-active':'border-transparent text-slate-400'} whitespace-nowrap transition">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}
+    </div>
+    <div id="statsBody">${loadingSkeleton()}</div>`;
+    
+  document.querySelectorAll('.stats-subtab').forEach(btn => btn.addEventListener('click', () => { statsSubTab = btn.dataset.tab; renderStatistics(document.getElementById('sectionContent')); }));
+  const body = document.getElementById('statsBody');
+  
+  try {
+    if (statsSubTab === 'overview') await renderStatsOverview(body);
+    else if (statsSubTab === 'mistakes') await renderStatsMistakes(body);
+    else await renderStatsContentType(body, statsSubTab);
+  } catch (e) { body.innerHTML = errorBlock(e.message); }
+}
+
+async function renderStatsOverview(body) {
+  const s = await api('/statistics');
+  body.innerHTML = `
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4"><p class="text-xs text-slate-400 mb-1">Overall Accuracy</p><p class="font-display text-2xl font-bold text-primary-600 dark:text-primary-400">${s.overall_accuracy}%</p></div>
+      <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4"><p class="text-xs text-slate-400 mb-1">Questions Answered</p><p class="font-display text-2xl font-bold">${s.total_questions}</p></div>
+      <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4"><p class="text-xs text-slate-400 mb-1">Lessons</p><p class="font-display text-2xl font-bold">${s.total_lessons}</p></div>
+      <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4"><p class="text-xs text-slate-400 mb-1">Avg Mastery</p><p class="font-display text-2xl font-bold text-emerald-500">${Math.round(s.avg_mastery*100)}%</p></div>
+    </div>
+    <h3 class="font-display font-bold mb-3">Breakdown per Content Type</h3>
+    <div class="grid grid-cols-3 gap-3 mb-6">
+      ${['grammar','vocabulary','kanji'].map(t => `
+        <div class="rounded-2xl bg-white dark:bg-slate-800 shadow-softer p-4 text-center">
+          <p class="text-[11px] uppercase tracking-wide text-slate-400 mb-1">${t}</p>
+          <p class="font-display text-xl font-bold ${s.breakdown[t].accuracy===null?'text-slate-300 dark:text-slate-600':'text-primary-600 dark:text-primary-400'}">${s.breakdown[t].accuracy===null?'-':s.breakdown[t].accuracy+'%'}</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">${s.breakdown[t].correct}/${s.breakdown[t].total}</p>
+        </div>`).join('')}
+    </div>
+    <div class="grid sm:grid-cols-2 gap-6">
+      <div>
+        <h3 class="font-display font-bold mb-3 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Weak Areas</h3>
+        <div class="space-y-2">${s.weak_areas.length ? s.weak_areas.map(w => statPill(w,'amber')).join('') : emptyBlock('Belum cukup data', 'fa-chart-simple')}</div>
+      </div>
+      <div>
+        <h3 class="font-display font-bold mb-3 flex items-center gap-2"><i class="fa-solid fa-star text-emerald-500"></i> Strong Areas</h3>
+        <div class="space-y-2">${s.strong_areas.length ? s.strong_areas.map(w => statPill(w,'emerald')).join('') : emptyBlock('Belum cukup data', 'fa-chart-simple')}</div>
+      </div>
+    </div>`;
+}
+
+function statPill(w, color) {
+  return `<div class="rounded-xl bg-white dark:bg-slate-800 shadow-softer p-3 flex items-center justify-between">
+    <span class="text-sm font-medium">${escapeHtml(w.label)}</span>
+    <span class="font-display font-bold text-${color}-500">${w.accuracy}%</span>
+  </div>`;
+}
+
+async function renderStatsContentType(body, type) {
+  const rows = await api(`/statistics/${type}`);
+  const cfg = CONTENT_CONFIGS[type];
+  body.innerHTML = rows.length ? `
+    <div class="space-y-2">
+      ${rows.map(r => `
+        <div class="rounded-xl bg-white dark:bg-slate-800 shadow-softer p-3.5 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="font-semibold text-sm">${escapeHtml(r.label)}</p>
+            <p class="text-xs text-slate-400">${r.correct_count} benar | ${r.wrong_count} salah</p>
+          </div>
+          <div class="text-right shrink-0">
+            <p class="font-display font-bold ${Number(r.accuracy) >= 70 ? 'text-emerald-500' : Number(r.accuracy) > 0 ? 'text-amber-500' : 'text-slate-300 dark:text-slate-600'}">${Math.round(Number(r.accuracy))}%</p>
+            <p class="text-[10px] text-slate-400">mastery ${Math.round(Number(r.mastery_score)*100)}%</p>
+          </div>
+        </div>`).join('')}
+    </div>` : emptyBlock(`Belum ada data ${cfg.label.toLowerCase()} yang pernah diuji.`);
+}
+
+async function renderStatsMistakes(body) {
+  const rows = await api('/mistakes');
+  body.innerHTML = rows.length ? `
+    <div class="space-y-2">
+      ${rows.map(m => `
+        <div class="rounded-xl bg-white dark:bg-slate-800 shadow-softer p-3.5" data-id="${m.id}">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="text-xs text-slate-400 mb-1">${escapeHtml(m.lesson_title)} | ${m.mistake_type}</p>
+              <p class="text-sm font-medium">${escapeHtml(m.question_text)}</p>
+              <p class="text-xs text-rose-500 mt-1">Salah: ${m.wrong_answer.toUpperCase()} | Benar: ${m.correct_answer.toUpperCase()}${m.content_label ? ` | ${escapeHtml(m.content_label)}` : ''}</p>
+            </div>
+            <button data-del="${m.id}" aria-label="Hapus" class="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-950/40 flex items-center justify-center text-rose-500 shrink-0"><i class="fa-solid fa-trash text-xs"></i></button>
+          </div>
+        </div>`).join('')}
+    </div>` : emptyBlock('Belum ada kesalahan tercatat. Kerja bagus!', 'fa-face-smile');
+    
+  body.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => {
+    confirmDelete('Hapus catatan kesalahan ini?', async () => {
+      await api(`/mistakes/${btn.dataset.del}`, { method: 'DELETE' });
+      showToast('Catatan mistake dihapus', 'success');
+      renderStatsMistakes(body);
+    });
+  }));
+}
+
+// =========================================================
+// INIT
+// =========================================================
+async function init() {
+  try { await api('/auth/me'); } catch (e) { return; }
+  const s = currentSection();
+  renderTabs(s);
+  renderSection(s);
+}
+init();
+</script>
+</body>
+</html>
