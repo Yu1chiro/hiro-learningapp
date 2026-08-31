@@ -363,7 +363,6 @@ apiRouter.get('/lessons/:id', requireAuth, ah(async (req, res) => {
   return ok(res, result.rows[0]);
 }));
 
-// FITUR BARU: Export Lesson data ke JSON
 apiRouter.get('/lessons/:id/export', requireAuth, ah(async (req, res) => {
   const id = toInt(req.params.id);
   if (!isPositiveInt(id)) return fail(res, 'ID lesson tidak valid', 422);
@@ -554,8 +553,8 @@ function registerContentCrud(routePath, table, requiredFields, optionalFields) {
   }));
 }
 
-registerContentCrud('grammar', 'grammar', ['pattern', 'meaning'], ['explanation', 'example_translation']);
-registerContentCrud('vocabulary', 'vocabulary', ['word', 'meaning'], ['reading', 'example_sentence', 'example_translation']);
+registerContentCrud('grammar', 'grammar', ['pattern', 'meaning'], ['explanation', 'example_sentence', 'example_translation']);
+registerContentCrud('vocabulary', 'vocabulary', ['word', 'meaning'], ['reading', 'part_of_speech', 'example_sentence', 'example_translation']);
 registerContentCrud('kanji', 'kanji', ['character', 'meaning'], ['onyomi', 'kunyomi', 'example_word', 'example_reading', 'example_sentence']);
 
 // =========================================================
@@ -1299,6 +1298,16 @@ app.use((err, req, res, next) => {
   return fail(res, 'Terjadi kesalahan pada server', 500);
 });
 
-app.listen(PORT, () => {
-  console.log(`JLPT N3 Learning OS running on port ${PORT} [${NODE_ENV}]`);
-});
+// =========================================================
+// START SERVER / VERCEL EXPORT
+// =========================================================
+// Jika dijalankan di Vercel, Vercel yang akan menjadi servernya.
+// Jika dijalankan di lokal, kita gunakan app.listen.
+if (process.env.NODE_ENV !== 'production' || require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`JLPT N3 Learning OS running on port ${PORT} [${NODE_ENV}]`);
+  });
+}
+
+// EXPORT WAJIB UNTUK VERCEL SERVERLESS FUNCTION
+module.exports = app;
