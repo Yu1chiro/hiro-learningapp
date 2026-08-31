@@ -21,6 +21,9 @@
     "express-session": "^1.18.0",
     "helmet": "^7.1.0",
     "pg": "^8.12.0",
-    "sanitize-html": "^2.13.0"
+    "sanitize-html": "^2.17.7"
+  },
+  "overrides": {
+    "htmlparser2": "^8.0.2"
   }
 }
